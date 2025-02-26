@@ -11,13 +11,12 @@
             margin: 0;
             padding: 0;
             background-color: #f9f9f9;
-            line-height: 1.6;
         }
         header {
             background-color: #333;
             color: white;
             text-align: center;
-            padding: 20px;
+            padding: 20px 0;
         }
         nav {
             background-color: #444;
@@ -29,49 +28,43 @@
             text-decoration: none;
             margin: 0 15px;
             font-weight: bold;
+            font-size: 14px;
         }
         .container {
             width: 100%;
-            max-width: 1200px;
             margin: auto;
             padding: 10px;
         }
         .content {
-            display: flex;
-            flex-wrap: wrap;
             margin-top: 20px;
-            justify-content: space-between;
+            display: block;
+            text-align: center;
         }
         .sidebar, .main, .updates {
-            padding: 20px;
+            padding: 15px;
             background: white;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            margin: 10px;
+            margin: 10px 0;
         }
-        .sidebar {
-            flex: 1;
-            min-width: 200px;
-        }
-        .main {
-            flex: 2;
-            text-align: center;
-        }
-        .updates {
-            flex: 1;
-            min-width: 200px;
+        .main img {
+            width: 90%;
+            max-width: 300px;
+            margin-top: 15px;
         }
         .about-section {
-            padding: 50px 20px;
+            padding: 30px 20px;
             background: white;
             text-align: center;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
         }
         .about-section h2 {
-            font-size: 2em;
+            font-size: 1.5em;
             margin-bottom: 20px;
         }
         .about-section p {
-            font-size: 1.2em;
-            max-width: 800px;
+            font-size: 1em;
+            max-width: 600px;
             margin: auto;
             line-height: 1.6;
         }
@@ -80,29 +73,31 @@
             color: white;
             text-align: center;
             padding: 15px;
+            margin-top: 20px;
+        }
+        footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
         }
         @media screen and (max-width: 768px) {
-            .content {
-                flex-direction: column;
-                align-items: center;
+            .container {
+                padding: 10px;
             }
-
-            .sidebar, .main, .updates {
-                width: 100%;
-                text-align: center;
-            }
-
-            .about-section h2 {
-                font-size: 1.5em;
-            }
-
-            .about-section p {
-                font-size: 1em;
-            }
-
             nav a {
                 display: block;
                 margin: 10px 0;
+                font-size: 16px;
+            }
+            .about-section h2 {
+                font-size: 1.3em;
+            }
+            .content {
+                padding: 0 10px;
+            }
+            .about-section p {
+                font-size: 1.1em;
+                line-height: 1.5;
             }
         }
     </style>
@@ -117,31 +112,20 @@
         <a href="friends.html">Найзууд</a>
         <a href="contact.html">Холбоо барих</a>
     </nav>
-    <div class="container content">
-        <div class="sidebar">
-            <h3>Цэс</h3>
-            <ul>
-                <li><a href="about.html">Миний тухай</a></li>
-                <li><a href="family.html">Гэр бүл</a></li>
-                <li><a href="friends.html">Найзууд</a></li>
-                <li><a href="contact.html">Холбоо барих</a></li>
-            </ul>
-        </div>
-        <div class="main">
+    <div class="container">
+        <div class="content">
             <h2>Нүүр хуудас</h2>
             <p>Энэхүү цахим хуудасны зорилго нь Чинбаяр гэж хэн бэ түүнтэй танилцах юм.</p>
-            <img src="chinba1.jpg" width="50%" alt="Нүүр хуудасны зураг">
+            <img src="chinba1.jpg" alt="Нүүр хуудасны зураг">
         </div>
-        <div class="updates">
-            <h3>Сүүлийн шинэчлэл</h3>
-            <p>2025 оны 2-р сарын 18</p>
+
+        <div class="about-section">
+            <h2>Chinbayar</h2>
+            <p>Сайн байна уу? Намайг Эрдэнэбилэг Чинбаяр гэдэг. Би веб хөгжүүлэлт болон мэдээллийн технологийн салбарт ажилладаг. Миний зорилго бол өндөр чанартай програм хангамж бүтээх бөгөөд шинэлэг шийдлүүдийг эрэлхийлэхийг эрмэлзэдэг билээ.</p>
+            <p>Та миний ажил болон бусад зүйлсийн талаар дэлгэрэнгүй мэдээлэл авахыг хүсвэл <a href="about.html">энд дарна уу</a>.</p>
         </div>
     </div>
-    <div class="about-section">
-        <h2>Chinbayar.</h2>
-        <p>Сайн байна уу? Намайг Эрдэнэбилэг Чинбаяр гэдэг. Би веб хөгжүүлэлт болон мэдээллийн технологийн салбарт ажилладаг. Миний зорилго бол өндөр чанартай програм хангамж бүтээх бөгөөд шинэлэг шийдлүүдийг эрэлхийлэхийг эрмэлзэдэг билээ.</p>
-        <p>Та миний ажил болон бусад зүйлсийн талаар дэлгэрэнгүй мэдээлэл авахыг хүсвэл <a href="about.html">энд дарна уу</a>.</p>
-    </div>
+
     <footer>
         <p>&copy; 2025 Эрдэнэбилэг Чинбаяр</p>
     </footer>
