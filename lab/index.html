@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Нүүр хуудас</title>
+    <title>Миний тухай</title>
     <link rel="stylesheet" href="style.css">
     <style>
         body {
@@ -11,22 +11,16 @@
             margin: 0;
             padding: 0;
             background-color: #f9f9f9;
-        }
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: auto;
+            text-align: center;
         }
         header {
             background-color: #333;
             color: white;
-            text-align: center;
             padding: 20px 0;
         }
         nav {
             background-color: #444;
             padding: 10px;
-            text-align: center;
         }
         nav a {
             color: white;
@@ -34,43 +28,24 @@
             margin: 0 15px;
             font-weight: bold;
         }
-        .content {
-            display: flex;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-        .sidebar, .main, .updates {
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: auto;
+            background: white;
             padding: 20px;
-            background: white;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            margin: 10px;
         }
-        .sidebar {
-            flex: 1;
-            min-width: 200px;
-        }
-        .main {
-            flex: 2;
-            text-align: center;
-        }
-        .updates {
-            flex: 1;
-            min-width: 200px;
-        }
-        .about-section {
-            padding: 50px 20px;
-            background: white;
-            text-align: center;
-        }
-        .about-section h2 {
-            font-size: 2em;
-            margin-bottom: 20px;
+        .about-section img {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            margin-top: 20px;
         }
         .about-section p {
             font-size: 1.2em;
-            max-width: 800px;
-            margin: auto;
             line-height: 1.6;
+            margin-top: 20px;
         }
         footer {
             background-color: #333;
@@ -79,16 +54,6 @@
             padding: 15px 0;
             margin-top: 20px;
         }
-        @media screen and (max-width: 768px) {
-            .content {
-                flex-direction: column;
-                align-items: center;
-            }
-            .sidebar, .main, .updates {
-                width: 100%;
-                text-align: center;
-            }
-        }
     </style>
 </head>
 <body>
@@ -96,35 +61,15 @@
         <h1>Эрдэнэбилэг Чинбаяр</h1>
     </header>
     <nav>
-        <a href="about.html">Миний тухай</a>
+        <a href="index.html">Нүүр</a>
         <a href="family.html">Гэр бүл</a>
         <a href="friends.html">Найзууд</a>
         <a href="contact.html">Холбоо барих</a>
     </nav>
-    <div class="container content">
-        <div class="sidebar">
-            <h3>Цэс</h3>
-            <ul>
-                <li><a href="about.html">Миний тухай</a></li>
-                <li><a href="family.html">Гэр бүл</a></li>
-                <li><a href="friends.html">Найзууд</a></li>
-                <li><a href="contact.html">Холбоо барих</a></li>
-            </ul>
-        </div>
-        <div class="main">
-            <h2>Нүүр хуудас</h2>
-            <p>Энэхүү цахим хуудасны зорилго нь Чинбаяр гэж хэн бэ түүнтэй танилцах юм.</p>
-            <img src="chinba1.jpg" width="50%" alt="Нүүр хуудасны зураг">
-        </div>
-        <div class="updates">
-            <h3>Сүүлийн шинэчлэл</h3>
-            <p>2025 оны 2-р сарын 18</p>
-        </div>
-    </div>
-    <div class="about-section">
-        <h2>Chinbayar.</h2>
-        <p>Сайн байна уу? Намайг Эрдэнэбилэг Чинбаяр гэдэг. Би веб хөгжүүлэлт болон мэдээллийн технологийн салбарт ажилладаг. Миний зорилго бол өндөр чанартай програм хангамж бүтээх бөгөөд шинэлэг шийдлүүдийг эрэлхийлэхийг эрмэлзэдэг билээ.</p>
-        <p>Та миний ажил болон бусад зүйлсийн талаар дэлгэрэнгүй мэдээлэл авахыг хүсвэл <a href="about.html">энд дарна уу</a>.</p>
+    <div class="container about-section">
+        <h2>Chnbayar.</h2>
+        <img src="chinba1.jpg" alt="Миний зураг">
+        <p>Сайн байна уу? Намайг Эрдэнэбилэг Чинбаяр гэдэг. Би веб хөгжүүлэлт болон мэдээллийн технологийн салбарт ажилладаг. Миний зорилго бол өндөр чанартай програм хангамж бүтээх бөгөөд шинэлэг шийдлүүдийг эрэлхийлэхийг эрмэлздэг билээ.</p>
     </div>
     <footer>
         <p>&copy; 2025 Эрдэнэбилэг Чинбаяр</p>
