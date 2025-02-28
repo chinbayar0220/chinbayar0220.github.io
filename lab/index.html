@@ -3,76 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Миний тухай</title>
+    <title>Chinbayar | Миний тухай</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-            text-align: center;
-        }
-        header {
-            background-color: #333;
-            color: white;
-            padding: 20px 0;
-        }
-        nav {
-            background-color: #444;
-            padding: 10px;
-        }
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin: 0 15px;
-            font-weight: bold;
-        }
-        .container {
-            width: 90%;
-            max-width: 800px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-        .about-section img {
-            width: 100%;
-            max-width: 400px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-        .about-section p {
-            font-size: 1.2em;
-            line-height: 1.6;
-            margin-top: 20px;
-        }
-        footer {
-            background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 15px 0;
-            margin-top: 20px;
-        }
-    </style>
 </head>
 <body>
     <header>
-        <h1>Эрдэнэбилэг Чинбаяр</h1>
+        <h1>Chinbayar.</h1>
+        <p>Erdenebileg Chinbayar - Веб хөгжүүлэгч</p>
     </header>
+
     <nav>
-        <a href="about.html"></a>
+        <a href="index.html">Нүүр</a>
+        <a href="about.html">Миний тухай</a>
+        <a href="projects.html">Төслүүд</a>
         <a href="family.html">Гэр бүл</a>
         <a href="friends.html">Найзууд</a>
         <a href="contact.html">Холбогдох</a>
     </nav>
+
     <div class="container about-section">
-        <h2>Chnbayar.</h2>
+        <h1>About Me</h1>
         <img src="chinba1.jpg" alt="Миний зураг">
-        <p>Сайн байна уу? Намайг Эрдэнэбилэг Чинбаяр гэдэг. Би веб хөгжүүлэлт болон мэдээллийн технологийн салбарт ажилладаг. Миний зорилго бол өндөр чанартай програм хангамж бүтээх бөгөөд шинэлэг шийдлүүдийг эрэлхийлэхийг эрмэлздэг билээ. Та миний ажил болон бусад зүйлсийн талаар дэлгэрэнгүй мэдээлэл авахыг хүсвэл <a href="about.html">энд дарна уу</a>.</p>
+        <p>Hello guys? Намайг <strong>Эрдэнэбилэг Чинбаяр</strong> гэдэг. Би веб хөгжүүлэлт болон мэдээллийн технологийн салбарт ажилладаг.</p>
+        
+        <div class="btn-container">
+            <a href="about.html" class="btn">Цааш үзэх</a>
+        </div>
     </div>
+
+    <!-- 📌 Нийтлэлүүдийн хэсэг -->
+    <div class="container blog-section">
+        <h2>Миний нийтлэлүүд</h2>
+        
+        <div class="blog-grid">
+            <div class="blog-post">
+                <img src="chinbayar1.jpg" alt="Нийтлэл 1">
+                <h3>Хэн нь илүү соёлтой вэ?</h3>
+                <p>2016-04-02</p>
+                <p>Би энэ нийтлэлээр хэн нэгэн хүнд гомдлоо тайлах гэсэнгүй...</p>
+                <a href="#" class="btn">Цааш үзэх</a>
+            </div>
+
+            <div class="blog-post">
+                <img src="post2.jpg" alt="Нийтлэл 2">
+                <h3>Өөрийгөө хайрлаж эхэлсэн байх нь</h3>
+                <p>2016-03-30</p>
+                <p>Өөрийгөө хайрлахыг сүүлийн 5 жилд толгойндоо хэрэгтэй мэдээлэл хийж...</p>
+                <a href="#" class="btn">Цааш үзэх</a>
+            </div>
+
+            <div class="blog-post">
+                <img src="post3.jpg" alt="Нийтлэл 3">
+                <h3>Миний долоо хоног хэрхэн өнгөрдөг вэ?</h3>
+                <p>2016-03-28</p>
+                <p>Хүн бүрт хорвоо ертөнц адилхан өдөрт 24 цаг заяадаг бөгөөд...</p>
+                <a href="#" class="btn">Цааш үзэх</a>
+            </div>
+        </div>
+    </div>
+
     <footer>
-        <p>&copy; 2025 оюуны өмчөөр хамгаалагдав</p>
+        <p>&copy; 2025 Эрдэнэбилэг Чинбаяр | Бүх эрх хуулиар хамгаалагдсан.</p>
+        <div class="social-links">
+            <a href="https://www.facebook.com/chinba.chinba.526" target="_blank">
+                <img src="facebook.png" alt="Facebook">
+            </a>
+            <a href="https://www.instagram.com/ch_nbayr/" target="_blank">
+                <img src="ig.png" alt="Instagram">
+            </a>
+            <a href="https://www.threads.net/@ch_nbayr?xmt=AQGzMxYRx3LkKzvtkAXYYuwRbcjKzHzDQkYfDMksoV2_IDE" target="_blank">
+                <img src="th.png" alt="Twitter">
+            </a>
+            <a href="https://www.youtube.com/watch?v=KzHOPckFmwc&list=RDMMKzHOPckFmwc&start_radio=1" target="_blank">
+                <img src="yt.png" alt="YouTube">
+            </a>
+            <a href="https://mail.google.com/mail/u/0/#inbox">
+                <img src="gmail.png" alt="Gmail">
+            </a>
+        </div>
     </footer>
 </body>
 </html>

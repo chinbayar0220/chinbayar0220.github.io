@@ -1,0 +1,140 @@
+/* Ерөнхий загвар */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    text-align: center;
+}
+
+/* Толгой хэсэг */
+header {
+    background-color: #222;
+    color: white;
+    padding: 20px 0;
+    font-size: 1.2em;
+}
+
+/* Навигаци */
+nav {
+    background-color: #444;
+    padding: 10px;
+}
+nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+}
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* Контент хэсэг */
+.container {
+    width: 90%;
+    max-width: 800px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+/* Зураг */
+.about-section img {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+/* Footer */
+footer {
+    background-color: #222;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    margin-top: 20px;
+}
+
+/* Social Icons */
+.social-links {
+    margin-top: 10px;
+}
+.social-links a {
+    margin: 0 10px;
+    display: inline-block;
+}
+.social-links img {
+    width: 30px;
+    height: 30px;
+}
+/* Social Icons Hover Effect */
+.social-links a {
+    margin: 0 10px;
+    display: inline-block;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+.social-links a:hover {
+    transform: scale(1.1); /* Бага зэрэг томруулна */
+    filter: brightness(1.8);
+    color: #f9f9f9; /* Гэрэлтэй болгоно */
+}
+/* Товчлуурын дизайн */
+.btn-container {
+    margin-top: 20px;
+    text-align: center; /* Товчлуурыг голлуулж байрлуулна */
+}
+
+.btn {
+    display: inline-block;
+    background-color: #222; /* Facebook шиг цэнхэр өнгө */
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.btn:hover {
+    background-color: #125abe; /* Харанхуй цэнхэр */
+    transform: scale(1.05); /* Жаахан томорно */
+}
+
+.blog-post {
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.blog-post h2 {
+    font-size: 1.5em;
+    color: #333;
+}
+
+.blog-post p {
+    font-size: 1em;
+    color: #555;
+}
+
+/* Товчлуурын стиль */
+.btn {
+    display: inline-block;
+    background-color: #1877f2;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.btn:hover {
+    background-color: #125abe;
+    transform: scale(1.05);
+}
+
