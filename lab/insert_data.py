@@ -42,7 +42,17 @@ cursor.execute("INSERT INTO Feedback (user_id, order_id, rating, comment) VALUES
 
 cursor.execute("INSERT INTO Refund (order_id, reason, refund_status) VALUES (%s, %s, %s)", 
                (1, "Буруу бүтээгдэхүүн ирсэн", "батлагдсан"))
-
+cursor.execute("""
+    INSERT INTO AccessControl (role_id, table_name, can_view, can_edit, can_delete)
+    VALUES
+    (1, 'User', TRUE, TRUE, TRUE),
+    (1, 'Orders', TRUE, TRUE, TRUE),
+    (1, 'Delivery', TRUE, TRUE, TRUE),
+    (1, 'Product', TRUE, TRUE, TRUE),
+    (2, 'Delivery', TRUE, TRUE, FALSE),
+    (3, 'Product', TRUE, FALSE, FALSE),
+    (3, 'Orders', TRUE, FALSE, FALSE)
+""")
 conn.commit()
 
 print("Өгөгдөл амжилттай нэмэгдлээ!")
