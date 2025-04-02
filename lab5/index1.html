@@ -1,239 +1,258 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webjunto - Hello, world!</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-       
-        .header {
-            background-color: #1B1B6C;
-            color: white;
-        }
-       
-        .logo {
-            font-weight: bold;
-            font-size: 24px;
-        }
-       
-        .logo img {
-            max-height: 30px;
-        }
-       
-        .jumbotron-custom {
-            background-color: #13124F;
-            color: white;
-            padding:30px;
-            margin-bottom: 0;
-        }
-       
-        .jumbotron-custom h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-        }
-       
-        .btn-pink {
-            background-color: #f61067;
-            color: white;
-            border: none;
-            text-transform: uppercase;
-            font-weight: bold;
-            padding: 8px 15px;
-            border-radius: 0px;
-        }
-       
-        .content {
-            padding: 30px;
-        }
-       
-        .sidebar {
-            margin-top: 30px;
-        }
-       
-        .messages-panel {
-            background-color: #f61067;
-            color: white;
-            padding: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-            border-radius: 0px;
-        }
-       
-        .candidate-panel {
-            background-color: #13124F;
-            color: white;
-            padding: 20px;
-            margin-top: 0px;
-            border-radius: 0px;
-        }
-        .candidate-header {
-            background-color: #9090A5;
-            margin-bottom: 0px;
-            padding: 8px;
-            color:white;
-            border-radius: 0px;
- 
-        }
-        .candidate-fooder {
-            background-color: #1B1B6C;
-            padding: 3px;
-            color: white;
-        }
-       
-        .candidate-panel input,
-        .candidate-panel button {
-            width: 100%;
-            border-radius: 0px;
-            background-color: #1B1B6c;
-        }
-       
-        .vote-panel {
-            padding: 15px;
-            border: 1px solid #ddd;
-            margin-bottom: 20px;
-        }
-       
-        .progress {
-            height: 8px;
-            margin: 15px 0;
-            border-radius: 0px;
-        }
-       
-        .progress-bar-pink {
-            background-color: #f61067;
-            border-radius: 0px;
-        }
-       
-        .progress-bar-teal {
-            background-color: #2ad392;
-            border-radius: 0px;
-        }
-       
-        .vote-buttons {
-            display: flex;
-            justify-content: space-between;
-            border-radius: 0px;
-        }
-       
-        .vote-buttons .btn {
-            width: 48%;
-            border-radius: 0px;
-        }
-       
-        .alert-custom {
-            background-color: #9090a5;
-            color: white;
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 0px;
-        }
-       
-        .footer {
-            background-color: #13124F;
-            color: white;
-            padding: 20px 30px;
-            font-size: 12px;
-        }
- 
-        #bi{
-            background-color: #f61067;
-            margin-top: 10px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Webjunto - Hello, world!</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    
+    .header {
+      background-color: #1B1B6C;
+      color: white;
+      padding: 10px 0;
+    }
+    
+    .logo {
+      font-weight: bold;
+      font-size: 24px;
+    }
+    
+    .logo img {
+      max-height: 30px;
+    }
+    
+    /* Жамботроны тохиргоо */
+    .jumbotron.jumbotron-custom {
+      background-color: #13124F;
+      color: white;
+      padding: 30px;
+      margin-bottom: 0;
+    }
+    
+    .jumbotron-custom h1 {
+      font-size: 48px;
+      margin-bottom: 0; /* Hello, world! хэсгийн доод зайг хассан */
+    }
+    
+    .btn-pink {
+      background-color: #f61067;
+      color: white;
+      border: none;
+      text-transform: uppercase;
+      font-weight: bold;
+      padding: 8px 15px;
+      border-radius: 0;
+    }
+    
+    .content {
+      padding: 30px;
+    }
+    
+    .sidebar {
+      margin-top: 30px;
+    }
+    
+    .messages-panel {
+      background-color: #f61067;
+      color: white;
+      padding: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+      border-radius: 0;
+    }
+    
+    .candidate-panel {
+      background-color: #13124F;
+      color: white;
+      padding: 20px;
+      margin-top: 0;
+      border-radius: 0;
+    }
+    
+    .candidate-header {
+      background-color: #9090A5;
+      padding: 8px;
+      color: white;
+      border-radius: 0;
+      margin-bottom: 0;
+    }
+    
+    .candidate-fooder {
+      background-color: #1B1B6C;
+      padding: 3px;
+      color: white;
+    }
+    
+    .candidate-panel input,
+    .candidate-panel button {
+      width: 100%;
+      border-radius: 0;
+      background-color: #1B1B6C;
+    }
+    
+    .vote-panel {
+      padding: 15px;
+      border: 1px solid #ddd;
+      margin-bottom: 20px;
+    }
+    
+    .progress {
+      height: 8px;
+      margin: 15px 0;
+      border-radius: 0;
+    }
+    
+    .progress-bar-pink {
+      background-color: #f61067;
+      border-radius: 0;
+    }
+    
+    .progress-bar-teal {
+      background-color: #2ad392;
+      border-radius: 0;
+    }
+    
+    .vote-buttons {
+      display: flex;
+      justify-content: space-between;
+      border-radius: 0;
+    }
+    
+    .vote-buttons .btn {
+      width: 48%;
+      border-radius: 0;
+    }
+    
+    .alert-custom {
+      background-color: #9090a5;
+      color: white;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 0;
+    }
+    
+    .footer {
+      background-color: #13124F;
+      color: white;
+      padding: 20px 30px;
+      font-size: 12px;
+      text-align: center;
+    }
+    
+    #bi {
+      background-color: #f61067;
+      margin-top: 10px;
+    }
+    
+    /* Өргөнийг 100% болгох тохиргоо */
+    .container-fluid {
+      width: 100%;
+      padding: 0 15px;
+    }
+  </style>
 </head>
 <body>
-    <!-- Header -->
-    <div class="header">
-        <div class="logo", style="text-align: left;", padding-top: 5px;>
-            <img src="img.png" alt=""><p></p>
+  <!-- Header хэсэг -->
+  <div class="header">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="logo" style="padding-top:5px;">
+            <img src="img.png" alt="Logo">
+          </div>
         </div>
-       
-        <!-- Jumbotron -->
-        <div class="jumbotron jumbotron-custom">
+      </div>
+      <!-- Жамботрон хэсэг -->
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="jumbotron jumbotron-custom">
             <h1>Hello, world!</h1>
             <p>Welcome to Bootstrap v3.3.7. Check out this awesome jumbotron!</p>
             <p>
-                <a class="btn btn-pink" href="#" role="button">Learn more</a>
+              <a class="btn btn-pink" href="#" role="button">Learn more</a>
             </p>
+          </div>
         </div>
+      </div>
     </div>
-   
-    <!-- Main Content -->
-    <div class="container">
-        <div class="row">
-            <!-- Left Content -->
-            <div class="col-md-8">
-                <div class="content">
-                    <h2>Heading goes here</h2>
-                    <hr>
-                    <p>
-                        Cupcake ipsum dolor sit amet caramels halvah soufflé sugar plum. Fruitcake lollipop tiramisu pastry halvah sweet lemon drops.
-                        Jelly beans marshmallow jujubes. Pudding macaroon chocolate cake chupa chups. Tootsie roll wafer jelly beans cotton candy jelly.
-                        Liquorice chocolate cake tart jelly. Chocolate pastry liquorice cupcake chocolate.
-                    </p>
-                   
-                    <!-- Video Embed -->
-                    <div class="embed-responsive embed-responsive-16by9">
-                        <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/Wrl6Sk-RuSg" allowfullscreen></iframe>
-                    </div>
-                   
-                    <!-- Alert -->
-                    <div class="alert alert-custom" role="alert">
-                        <span class="glyphicon glyphicon-info-sign"></span> Whoa! This is a super important alert!
-                    </div>
-                </div>
-            </div>
-           
-            <!-- Right Sidebar -->
-            <div class="col-md-4">
-                <div class="sidebar">
-                    <!-- Messages Panel -->
-                    <div class="messages-panel">
-                        <span class="glyphicon glyphicon-envelope"></span> MESSAGES <span class="badge">3</span>
-                    </div>
-                   
-                    <!-- Candidate Panel -->
-                    <div class="candidate-header">
-                        <h4>Welcome Candidate!</h4>
-                    </div>
-                    <div class="candidate-panel">
-                        <p>You are a Starfleet Academy candidate. Greet the Captain in a <em>respectful</em> fashion.</p>
-                        <p style="background-color:#9090a5; height: 3px; margin: 0px"></p>
-                        <input type="text" class="form-control" placeholder="Input your greeting...">
-                        <p style="background-color:#9090a5; height: 4px; margin: 0px"></p>
-                        <button class="btn btn-pink" id="bi">SEND</button>
-                    </div>
-                    <div class="candidate-fooder">
-                        <p class="text-center" style="font-size: 10px; margin-top: 10px;">
-                            I don't watch Star Trek and don't get this reference
-                    </p>
-                    </div>
-                   
-                    <!-- Vote Panel -->
-                    <div class="vote-panel">
-                        <p>Cast your vote! What do you think about space? See vote progress bar below!</p>
-                        <div class="progress">
-                            <div class="progress-bar progress-bar-pink" style="width: 65%; border-radius: 0px;"></div>
-                            <div class="progress-bar progress-bar-teal" style="width: 35%; border-radius: 0px;"></div>
-                        </div>
-                        <div class="vote-buttons">
-                            <button class="btn btn-pink">COOL</button>
-                            <button class="btn btn-default" style="border: 1px solid #2ad392; color: #2ad392;">LAME</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  </div>
+  
+  <!-- Гол контент -->
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Зүүн тал контент -->
+      <div class="col-md-8">
+        <div class="content">
+          <h2>Heading goes here</h2>
+          <hr>
+          <p>
+            Cupcake ipsum dolor sit amet caramels halvah soufflé sugar plum. Fruitcake lollipop tiramisu pastry halvah sweet lemon drops.
+            Jelly beans marshmallow jujubes. Pudding macaroon chocolate cake chupa chups. Tootsie roll wafer jelly beans cotton candy jelly.
+            Liquorice chocolate cake tart jelly. Chocolate pastry liquorice cupcake chocolate.
+          </p>
+          <!-- Видео оруулах хэсэг -->
+          <div class="embed-responsive embed-responsive-16by9">
+            <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/Wrl6Sk-RuSg" allowfullscreen></iframe>
+          </div>
+          <!-- Анхааруулга -->
+          <div class="alert alert-custom" role="alert">
+            <span class="glyphicon glyphicon-info-sign"></span> Whoa! This is a super important alert!
+          </div>
         </div>
+      </div>
+      
+      <!-- Баруун талын самбар -->
+      <div class="col-md-4">
+        <div class="sidebar">
+          <!-- Мессеж панель -->
+          <div class="messages-panel">
+            <span class="glyphicon glyphicon-envelope"></span> MESSAGES <span class="badge">3</span>
+          </div>
+          <!-- Кандидат панель -->
+          <div class="candidate-header">
+            <h4>Welcome Candidate!</h4>
+          </div>
+          <div class="candidate-panel">
+            <p>You are a Starfleet Academy candidate. Greet the Captain in a <em>respectful</em> fashion.</p>
+            <p style="background-color:#9090a5; height: 3px; margin: 0;"></p>
+            <input type="text" class="form-control" placeholder="Input your greeting...">
+            <p style="background-color:#9090a5; height: 4px; margin: 0;"></p>
+            <button class="btn btn-pink" id="bi">SEND</button>
+          </div>
+          <div class="candidate-fooder">
+            <p class="text-center" style="font-size: 10px; margin-top: 10px;">
+              I don't watch Star Trek and don't get this reference
+            </p>
+          </div>
+          <!-- Санал өгөх панель -->
+          <div class="vote-panel">
+            <p>Cast your vote! What do you think about space? See vote progress bar below!</p>
+            <div class="progress">
+              <div class="progress-bar progress-bar-pink" style="width: 65%;"></div>
+              <div class="progress-bar progress-bar-teal" style="width: 35%;"></div>
+            </div>
+            <div class="vote-buttons">
+              <button class="btn btn-pink">COOL</button>
+              <button class="btn btn-default" style="border: 1px solid #2ad392; color: #2ad392;">LAME</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-   
-    <!-- Footer -->
-    <div class="footer">
-        2017 All Rights Reserved. SomeCompany.
-    </div>
- 
+  </div>
+  
+  <!-- Футер -->
+  <div class="footer">
+    2017 All Rights Reserved. SomeCompany.
+  </div>
+  
+  <!-- Bootstrap-ийн шаардлагатай JS файлууд -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>
 </html>
