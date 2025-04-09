@@ -797,41 +797,41 @@ nav.social.social-white.text-md-end > a > i{
     color:white !important;
     padding:0px 7px 0px 7px;
 }
-footer.bg-dark {
-    background-color: #1a1a1a !important;
-    padding: 3rem 0;
-}
-
-footer .widget h4 {
-    color: #fff;
-    font-size: 1.2rem;
-    margin-bottom: 1.5rem;
-}
-
-footer .widget ul li a {
-    color: #ccc;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-footer .widget ul li a:hover {
-    color: #fff;
-}
-.card {
-    border: none;
-    border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.card-body {
-    padding: 2rem;
-}
-figure img {
-    border-radius: 10px;
+.btn.btn-primary {
+    background-color: #ff4500; /* Улбар шар */
+    border: 2px solid #ff4500;
+    color: #ffffff;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 15px 30px;
+    border-radius: 50px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease;
 }
 
-figure img:hover {
-    transform: scale(1.05);
+.btn.btn-outline-primary {
+    border: 2px solid #ff4500;
+    color: #ff4500;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 15px 30px;
+    border-radius: 50px;
+    background-color: transparent;
+}
+
+.btn.btn-outline-primary:hover {
+    background-color: #ff4500;
+    color: #ffffff;
+}
+h1.display-1 {
+    font-size: 4rem;
+    font-weight: 700;
+    color: #333;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h2.fs-16 {
+    font-size: 1.2rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
 }
