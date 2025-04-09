@@ -822,16 +822,3 @@ nav.social.social-white.text-md-end > a > i{
     background-color: #ff4500;
     color: #ffffff;
 }
-h1.display-1 {
-    font-size: 4rem;
-    font-weight: 700;
-    color: #333;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-h2.fs-16 {
-    font-size: 1.2rem;
-    color: #666;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-}
