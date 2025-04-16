@@ -822,3 +822,53 @@ nav.social.social-white.text-md-end > a > i{
     background-color: #ff4500;
     color: #ffffff;
 }
+
+/* Гарчгийн сумын стиль */
+.accordion-button::before {
+    content: "";
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>');
+    background-size: contain;
+    vertical-align: middle;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Идэвхтэй төлөв */
+  .accordion-button:not(.collapsed)::before {
+    transform: rotate(90deg);
+  }
+  
+  /* Ховер эффект */
+  .accordion-button:hover::before {
+    transform: translateX(3px);
+  }
+  
+
+
+  /* Гарчгийн сумын стиль */
+.collapsed::before {
+    content: "";
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>');
+    background-size: contain;
+    vertical-align: middle;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Идэвхтэй төлөв */
+  .collapsed:not(.collapsed)::before {
+    transform: rotate(90deg);
+  }
+  
+  /* Ховер эффект */
+  .collapsed:hover::before {
+    transform: translateX(3px);
+  }
+
+  
