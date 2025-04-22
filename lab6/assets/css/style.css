@@ -823,7 +823,6 @@ nav.social.social-white.text-md-end > a > i{
     color: #ffffff;
 }
 
-/* Гарчгийн сумын стиль */
 .accordion-button::before {
     content: "";
     display: inline-block;
@@ -836,19 +835,16 @@ nav.social.social-white.text-md-end > a > i{
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
-  /* Идэвхтэй төлөв */
   .accordion-button:not(.collapsed)::before {
     transform: rotate(90deg);
   }
   
-  /* Ховер эффект */
   .accordion-button:hover::before {
     transform: translateX(3px);
   }
   
 
 
-  /* Гарчгийн сумын стиль */
 .collapsed::before {
     content: "";
     display: inline-block;
@@ -861,14 +857,11 @@ nav.social.social-white.text-md-end > a > i{
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
-  /* Идэвхтэй төлөв */
   .collapsed:not(.collapsed)::before {
     transform: rotate(90deg);
   }
   
-  /* Ховер эффект */
   .collapsed:hover::before {
     transform: translateX(3px);
   }
 
-  
