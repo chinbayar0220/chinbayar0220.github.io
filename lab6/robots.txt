@@ -1,0 +1,6 @@
+# Бүх crawler-уудыг сайтад бүрэн нэвтрүүлэх
+User-agent: *
+Disallow:
+
+# Хэрэв таны sitemap байгаа бол заавал оруулна уу
+Sitemap: https://chinbayar0220.github.io/sitemap.xml
