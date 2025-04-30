@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daalgavar</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; }
+        h1 { color: #333; margin-top: 2em; }
+        label { display: block; margin: 0.5em 0 0.2em; }
+        input { padding: 0.4em; width: 100%; max-width: 300px; }
+        button { margin-top: 0.5em; padding: 0.5em 1em; cursor: pointer; }
+        p { margin-top: 0.5em; font-weight: bold; }
+
+        .square { width: 50px; height: 50px; position: fixed; }
+        .green  { background-color: #4caf50; }
+        .red    { background-color: #f44336; }
+    </style>
+</head>
+<body>
+    <h1>1. Палиндром шалгах</h1>
+    <label for="nameInput">Нэрээ оруулна уу:</label>
+    <input type="text" id="nameInput">
+    <button onclick="checkPalindrome()">Шалгах</button>
+    <p id="result"></p>
+
+    <h1>2. Гараас өгсөн тооны цифрүүдийн нийлбэр</h1>
+    <label for="digitSumInput">Тоог оруул:</label>
+    <input type="number" id="digitSumInput">
+    <button onclick="niilberOloh()">Нийлбэр олох</button>
+    <p id="result1"></p>
+
+    <h1>3. Анхны тоон нийлбэрт задлах</h1>
+    <label for="primeDecompInput">Задлах тоог оруул:</label>
+    <input type="number" id="primeDecompInput">
+    <button onclick="anhnii_toond_zadlah()">Анхны тоонд задлах</button>
+    <p id="result2"></p>
+
+    <h1>4. Чоно туулай гүйцэх хугацаа</h1>
+    <label for="distanceInput">Эхний зай (км):</label>
+    <input type="number" id="distanceInput">
+    <button onclick="chono()">Хугацаа тооцох</button>
+    <p id="result3"></p>
+
+    <h1>5. Хүснэгт (array)-д байгаа утгуудыг тэгш, сондгой ялгах</h1>
+    <label for="arrayInput">Тоонуудыг комамаар тусгаарлан оруул:</label>
+    <input type="text" id="arrayInput" placeholder="жишээ: 1, 2, 3, 4, 5">
+    <button onclick="splitEvenOdd()">Ялгах</button>
+    <p id="evenResult"></p>
+    <p id="oddResult"></p>
+
+    <h1>6. Тоот олох </h1>
+    <label for="toot">Айлын тооныг оруул:</label>
+    <input type="number" id="toot">
+    <button onclick="toot()">Тоотыг олох</button>
+    <p id="result5"></p>
+
+
+    <h1>8. Агшин-агшны тоглоом</h1>
+    <label for="coinsInput">Зоосны тоо (n):</label>
+    <input type="number" id="coinsInput">
+    <button onclick="findK()">Шийдвэрлэх k</button>
+    <p id="result8"></p>
+    <script>
+        function checkPalindrome() {
+            const name = document.getElementById('nameInput').value.trim();
+            const normalized = name.toLowerCase().replace(/[^a-zа-яөүё]/gi, '');
+            const reversed = normalized.split('').reverse().join('');
+            const result = (normalized === reversed)
+                ? `"${name}" нь палиндром байна.`
+                : `"${name}" нь палиндром биш байна.`;
+            document.getElementById('result').innerText = result;
+        }
+
+        function niilberOloh() {
+            const too = document.getElementById('digitSumInput').value.trim();
+            let sum = 0;
+            for (let i = 0; i < too.length; i++) {
+                sum += parseInt(too[i]);
+            }
+            document.getElementById('result1').innerText = "Нийлбэр: " + sum;
+        }
+
+        function isPrime(num) {
+            if (num < 2) return false;
+            for (let i = 2; i <= Math.sqrt(num); i++) {
+                if (num % i === 0) return false;
+            }
+            return true;
+        }
+
+        function anhnii_toond_zadlah() {
+            const too = document.getElementById('primeDecompInput').value;
+            let n = parseInt(too);
+            const primes = [];
+
+            for (let i = 2; i <= n; i++) {
+                while (isPrime(i) && n >= i) {
+                    primes.push(i);
+                    n -= i;
+                }
+            }
+
+            if (n === 0) {
+                document.getElementById('result2').innerText = too + " = " + primes.join(" + ");
+            } else {
+                document.getElementById('result2').innerText = "Задлаж чадсангүй.";
+            }
+        }
+
+        function chono() {
+            const d = parseFloat(document.getElementById('distanceInput').value);
+            const wolf = 25;
+            const rabbit = 18;
+            const zoruu = wolf - rabbit;
+
+            if (isNaN(d) || d < 0) {
+                document.getElementById('result3').innerText = "Зайг зөв оруулна уу.";
+                return;
+            }
+
+            const timeHours = d / zoruu;
+            const timeSeconds = timeHours * 3600;
+            const minutes = Math.floor(timeSeconds / 60);
+            const seconds = Math.round(timeSeconds % 60);
+
+            document.getElementById('result3').innerText = `${minutes} минут ${seconds} секундийн дараа гүйцэнэ.`;
+        }
+        function splitEvenOdd(){
+          const input = document.getElementById('arrayInput').value;
+          const nums = input.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+          const evens = nums.filter(n => n % 2 === 0);
+          const odds = nums.filter(n => n % 2 !== 0);
+          document.getElementById('evenResult').innerText = 'Тэгш тоонууд: ' + (evens.length ? evens.join(', ') : 'алга');
+          document.getElementById('oddResult').innerText = 'Сондгой тоонууд: ' + (odds.length ? odds.join(', ') : 'алга');
+        }
+
+        function toot(){
+          const apartment = parseInt(document.getElementById('toot').value);
+
+            if (isNaN(apartment) || apartment < 1 || apartment > 108) {
+                document.getElementById('result5').innerText = 'Зөвхөн 1-108 тооны хооронд оруулна уу.';
+                return;
+            }
+            const floorsPerEntrance = 4; 
+            const apartmentsPerEntrance = 36; 
+
+            const entrance = Math.ceil(apartment / apartmentsPerEntrance);
+
+            const floor = Math.ceil((apartment - (entrance-1) * apartmentsPerEntrance) / floorsPerEntrance);
+            const door = apartment - (entrance - 1) * apartmentsPerEntrance - (floor - 1) * floorsPerEntrance;
+
+            document.getElementById('result5').innerText = `${apartment}-р айл ${entrance}-р орцын ${floor}-р давхарт, ${door}-р хаалган дээр байна.`;        }
+        
+        window.onload = function(){
+            const h=new Date().getHours();
+            const sq=document.createElement('div'); sq.className='square '+(h>=6&&h<18?'green':'red');
+            if(h>=6&&h<18) sq.style.top='0',sq.style.left='0';
+            else sq.style.bottom='0',sq.style.right='0';
+            document.body.appendChild(sq);
+        };
+
+        function findK() {
+            const n = parseInt(document.getElementById('coinsInput').value);
+            if (isNaN(n) || n <= 0) {
+                document.getElementById('result8').innerText = 'n -ийг зөв оруулна уу (1-с их).';
+                return;
+            }
+            const dp = Array(n+1).fill(false);
+            dp[0] = false; // 0 зоостой хүн хожигддог
+            for (let i = 1; i <= n; i++) {
+                for (let k = 1; k <= i; k++) {
+                    let win = false;
+                    for (let opp = 1; opp <= k+1; opp++) {
+                        if (i - k - opp < 0 || !dp[i - k - opp]) {
+                            win = true;
+                            break;
+                        }
+                    }
+                    if (win) {
+                        dp[i] = true;
+                        break;
+                    }
+                }
+            }
+            let answer = 0;
+            for (let k = 1; k <= n; k++) {
+                let canWin = true;
+                for (let opp = 1; opp <= k+1; opp++) {
+                    if (n - k - opp >= 0 && dp[n - k - opp]) {
+                        canWin = false;
+                        break;
+                    }
+                }
+                if (canWin) { answer = k; break; }
+            }
+            document.getElementById('result8').innerText = answer > 0
+                ? `Петяг хожигдохгүй байхын тулд  ${answer} зоос авах хэрэгтэй.`
+                : 'Ялах боломжгүй.';
+        }
+</script>
+</body>
+</html>
