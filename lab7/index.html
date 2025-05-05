@@ -57,11 +57,48 @@
 
 
     <h1>8. Агшин-агшны тоглоом</h1>
-    <label for="coinsInput">Зоосны тоо (n):</label>
-    <input type="number" id="coinsInput">
-    <button onclick="findK()">Шийдвэрлэх k</button>
-    <p id="result8"></p>
+    <h1>3 тооны хамгийн бага ерөнхий хуваагдагчийг олох</h1>
+
+    <label for="num1">1тоо:</label>
+    <input type="number" id="num1">
+
+    <label for="num2">2тоо:</label>
+    <input type="number" id="num2">
+
+    <label for="num3">3 тоо:</label>
+    <input type="number" id="num3">
+
+    <button onclick="oloh()">хбех олох</button>
+
+    <p id="result55"></p>
+
     <script>
+        function hiyh(a, b) {
+            while (b !== 0) {
+                const hadgalah = b;
+                b = a % b;
+                a = hadgalah;
+            }
+            return a;
+        }
+
+        function hbeh(a, b) {
+            return Math.abs(a * b) / hiyh(a, b);
+        }
+
+        function oloh() {
+        const a = parseInt(document.getElementById('num1').value);
+        const b = parseInt(document.getElementById('num2').value);
+        const c = parseInt(document.getElementById('num3').value);
+
+        const AB = hbeh(a, b);
+        const ABC = hbeh(AB, c);
+
+        document.getElementById('result55').innerText =
+            `Гурван тооны хамгийн бага ерөнхий хуваагдагч = ${ABC}`;
+    }
+
+
         function checkPalindrome() {
             const name = document.getElementById('nameInput').value.trim();
             const normalized = name.toLowerCase().replace(/[^a-zа-яөүё]/gi, '');
