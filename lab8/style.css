@@ -1,0 +1,143 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+                url('batman.jpg') center/cover fixed;
+    font-family: 'Bahnschrift', 'Arial Narrow', sans-serif;
+    background-attachment: fixed;
+    overflow: hidden;
+
+}
+
+.calculator {
+    width: 95%;
+    max-width: 400px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.9);
+    border-radius: 15px;
+    border: 3px solid #ffd700;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+    margin: 20px;
+}
+
+#inputAmount {
+    width: 100%;
+    height: 70px;
+    margin-bottom: 20px;
+    font-size: 2em;
+    text-align: right;
+    padding: 15px;
+    border: 2px solid #ffd700;
+    border-radius: 8px;
+    background: #000;
+    color: #ffd700;
+    caret-color: #ffd700;
+}
+
+.currency-selectors {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+select {
+    flex: 1 1 200px;
+    padding: 12px;
+    font-size: 1.1em;
+    background: #111;
+    color: #ffd700;
+    border: 2px solid #ffd700;
+    border-radius: 6px;
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffd700" width="24px" height="24px"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+button {
+    padding: 18px;
+    font-size: 1.2em;
+    border: none;
+    background: #1a1a1a;
+    color: #ffd700;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 5px;
+}
+
+button:hover {
+    background: #ffd700;
+    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+}
+
+.convert-btn {
+    grid-column: span 2;
+    background: #0047ab;
+    color: white;
+}
+
+.convert-btn:hover {
+    background: #002d5a;
+}
+
+#result {
+    margin-top: 20px;
+    font-size: 1.5em;
+    padding: 15px;
+    background: #000;
+    border-radius: 8px;
+    color: #ffd700;
+    border: 2px solid #ffd700;
+    min-height: 60px;
+}
+
+@media (max-width: 480px) {
+    #inputAmount {
+        height: 60px;
+        font-size: 1.5em;
+    }
+
+    button {
+        padding: 15px;
+        font-size: 1em;
+    }
+
+    select {
+        font-size: 1em;
+    }
+
+    #result {
+        font-size: 1.2em;
+    }
+}
+
+@media (max-width: 360px) {
+    .calculator {
+        padding: 15px;
+    }
+
+    #inputAmount {
+        padding: 10px;
+    }
+
+    button {
+        padding: 12px;
+    }
+}
