@@ -1,0 +1,414 @@
+:root {
+      /* XIII Зууны Монгол хэв маягийн өнгөнүүд */
+      --parchment-bg: #F5EFE6; /* Хуйлмал цаасны дэвсгэр */
+      --leather-brown: #8B5A2B; /* Арьсан бор */
+      --dark-wood: #5D4037;    /* Бараан мод */
+      --muted-gold: #C0A062;   /* Бүдэг алтлаг */
+      --deep-red: #9A3B3B;     /* Гүн улаан (аюул) */
+      --sky-blue: #87CEEB;     /* Тэнгэрийн хөх (үндсэн товч) */
+      --dark-text: #4A3B31;    /* Бараан бичгийн өнгө */
+      --light-text: #F5EFE6;   /* Цайвар бичгийн өнгө */
+      --border-color: #6F4F28; /* Хүрээний өнгө */
+      --success-green: #5E8C6A; /* Зөв (ногоон) */
+      --hint-yellow: #E8D8B5;  /* Сануулгын шар */
+
+      /* Үсгийн фонт */
+      --font-heading: 'Cinzel Decorative', serif; /* Гарчигны фонт */
+      --font-body: 'Kurale', serif;              /* Үндсэн бичвэрийн фонт */
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: var(--font-body);
+    }
+    
+    body {
+      background-color: var(--parchment-bg);
+      color: var(--dark-text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background-image: url('old_paper.avif');
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      background-color: rgba(76, 66, 53, 0.3);
+      border: 2px solid var(--border-color);
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      width: 100%;
+      padding: 25px 0;
+      background-color: var(--dark-wood); /* Бараан мод/арьс */
+      color: var(--light-text); /* Цайвар бичиг */
+      border-radius: 10px;
+      border-bottom: 5px solid var(--muted-gold); /* Алтлаг доод хүрээ */
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    h1 {
+      font-family: var(--font-heading); /* Гарчигны фонт */
+      font-size: 2.8rem; /* Хэмжээг томсгосон */
+      margin-bottom: 10px;
+      font-weight: 700;
+      color: var(--muted-gold);
+      padding: 20px; /* Алтлаг өнгө */
+    }
+    header p {
+        color: var(--parchment-bg);
+        font-size: 1.1rem;
+    }
+    
+    .game-area {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .hangman-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 20px 0;
+      background-color: rgba(245, 239, 230, 0.7); /* Бага зэрэг тунгалаг хуйлмал цаас */
+      border-radius: 10px;
+      border: 3px solid var(--border-color); /* Модон хүрээ мэт */
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.2); /* Дотогшоо сүүдэр */
+    }
+    
+    .letter-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 25px 0;
+    }
+    
+    .letter-box {
+      width: 45px; /* Бага зэрэг томсгосон */
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--dark-wood); /* Бараан мод/чулуун хүрээ */
+      border-radius: 8px; /* Дугуйрсан */
+      font-size: 1.8rem; /* Үсгийн хэмжээ */
+      font-weight: bold;
+      background-color: var(--parchment-bg); /* Хуйлмал цаасны өнгө */
+      color: var(--dark-text);
+      text-transform: uppercase; 
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.2); /* Жижиг сүүдэр */
+      transition: transform 0.2s;
+    }
+    .letter-box:not(:empty) { /* Үсэгтэй нүдийг тодотгох */
+        background-color: var(--muted-gold);
+        color: var(--dark-wood);
+        border-color: var(--dark-wood);
+    }
+    
+    .keyboard {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px; /* Зайг нэмэгдүүлсэн */
+      margin: 25px 0;
+      width: 100%;
+    }
+    
+    .key {
+      min-width: 40px; /* Бага зэрэг томсгосон */
+      height: 40px;
+      padding: 5px;
+      background-color: var(--leather-brown); /* Арьсан бор */
+      color: var(--light-text); /* Цайвар бичиг */
+      border: 2px solid var(--dark-wood); /* Бараан хүрээ */
+      border-radius: 8px; /* Дугуйрсан */
+      font-size: 1.2rem; /* Үсгийн хэмжээ */
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 3px var(--dark-wood); /* 3D эффект */
+    }
+    
+    .key:hover {
+      background-color: var(--muted-gold); /* Алтлаг өнгө */
+      color: var(--dark-text); /* Бараан бичиг */
+      transform: translateY(-2px); /* Дээрээс түлхэх эффект */
+      box-shadow: 0 5px var(--dark-wood);
+    }
+     .key:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px var(--dark-wood);
+    }
+    
+    .key.used {
+      background-color: #95a5a6; /* Саарал өнгө */
+      color: var(--parchment-bg);
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: translateY(1px);
+    }
+    
+    .key.correct {
+      background-color: var(--success-green); /* Ногоон */
+      color: var(--light-text);
+      border-color: darken(var(--success-green), 10%);
+    }
+    
+    .key.wrong {
+      background-color: var(--deep-red); /* Улаан */
+      color: var(--light-text);
+      border-color: darken(var(--deep-red), 10%);
+    }
+    
+    .stats {
+      display: flex;
+      justify-content: space-around; /* Адил зайтай болгосон */
+      width: 100%;
+      margin: 25px 0;
+    }
+    
+    .stats > div {
+      padding: 12px 18px;
+      background-color: rgba(139, 90, 43, 0.2); /* Арьсан өнгөний тунгалаг хувилбар */
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border-color);
+      font-size: 1.1rem; /* Хэмжээг тохируулсан */
+    }
+    
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.75); /* Илүү бараан тунгалаг дэвсгэр */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+    
+    .modal-content {
+      width: 90%;
+      max-width: 450px; /* Бага зэрэг өргөсгөсөн */
+      background-color: var(--parchment-bg); /* Хуйлмал цаас */
+      padding: 35px; /* Зайг нэмэгдүүлсэн */
+      border-radius: 15px; /* Илүү дугуйрсан */
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      text-align: center;
+      border: 3px solid var(--dark-wood); /* Бараан модон хүрээ */
+    }
+    .modal-content h2 {
+        font-family: var(--font-heading);
+        color: var(--dark-wood);
+        font-size: 2rem;
+        margin-bottom: 15px;
+    }
+    .modal-content p {
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+        color: var(--dark-text);
+    }
+    
+    input[type="text"] { /* Зөвхөн текст input-д зориулсан */
+      width: 100%;
+      padding: 12px;
+      margin: 20px 0;
+      border: 2px solid var(--border-color); /* Хүрээний өнгө */
+      border-radius: 8px;
+      font-size: 1rem;
+      background-color: var(--light-text); /* Цайвар дэвсгэр */
+      color: var(--dark-text);
+    }
+    
+    button {
+      padding: 12px 25px; /* Хэмжээг нэмэгдүүлсэн */
+      background-color: var(--sky-blue); /* Тэнгэрийн хөх */
+      color: var(--dark-text); /* Бараан бичиг */
+      border: 2px solid var(--dark-wood); /* Бараан хүрээ */
+      border-radius: 8px;
+      font-size: 1.1rem; /* Хэмжээг нэмэгдүүлсэн */
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin: 8px; 
+      box-shadow: 0 3px var(--dark-wood);
+    }
+    
+    button:hover {
+      background-color: var(--muted-gold); /* Алтлаг */
+      color: var(--dark-text);
+      border-color: var(--dark-text);
+      transform: translateY(-2px);
+      box-shadow: 0 5px var(--dark-text);
+    }
+    button:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px var(--dark-text);
+    }
+
+    button:disabled {
+        background-color: #A0A0A0; /* Саарал */
+        color: #D0D0D0;
+        border-color: #707070;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+    
+    .hint-area { 
+      margin-top: 15px; 
+      margin-bottom: 15px; 
+      padding: 12px;
+      background-color: var(--hint-yellow); /* Сануулгын шар */
+      border-radius: 8px;
+      text-align: center;
+      font-weight: bold;
+      width: 100%; 
+      color: var(--dark-text);
+      border: 1px dashed var(--border-color); /* Тасархай хүрээ */
+    }
+
+    #word-status {
+        margin-top: 15px;
+        color: var(--success-green); /* Ногоон */
+        font-weight: bold;
+        min-height: 24px; 
+        font-size: 1.2rem;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 25px 0;
+      background-color: var(--parchment-bg); /* Хуйлмал цаас */
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 3px 7px rgba(0,0,0,0.2);
+      border: 2px solid var(--dark-wood); /* Хүснэгтийн хүрээ */
+    }
+    
+    th, td {
+      padding: 14px 18px; /* Зайг нэмэгдүүлсэн */
+      text-align: left;
+      border-bottom: 1px solid var(--border-color); /* Хүрээний өнгө */
+    }
+    
+    th {
+      background-color: var(--leather-brown); /* Арьсан бор */
+      color: var(--light-text); /* Цайвар бичиг */
+      font-family: var(--font-heading); /* Гарчигны фонт */
+      font-size: 1.1rem;
+    }
+    
+    tr:nth-child(even) {
+      background-color: rgba(216, 195, 165, 0.2); /* Бүдэг бор */
+    }
+    
+    tr:hover {
+      background-color: var(--hint-yellow); /* Сануулгын шар */
+      color: var(--dark-text);
+    }
+    
+    .tabs {
+      display: flex;
+      width: 100%;
+      margin: 25px 0;
+      border-radius: 8px;
+      overflow: hidden; /* Хүрээг дугуй харагдуулах */
+      border: 2px solid var(--dark-wood);
+    }
+    
+    .tab {
+      padding: 12px 20px;
+      background-color: var(--leather-brown); /* Арьсан бор */
+      color: var(--light-text);
+      border: none;
+      cursor: pointer;
+      flex: 1;
+      text-align: center;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    .tab:not(:last-child) {
+        border-right: 2px solid var(--dark-wood); /* Таб хоорондын шугам */
+    }
+    
+    .tab.active {
+      background-color: var(--muted-gold); /* Алтлаг */
+      color: var(--dark-text); /* Бараан бичиг */
+    }
+    
+    .tab-content {
+      display: none;
+      width: 100%;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .hangman-drawing {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+    
+    svg line, svg circle, svg ellipse {
+      stroke: var(--dark-text); /* Дүүжлүүрийн өнгө */
+      stroke-width: 4; /* Бага зэрэг зузаан */
+      fill: transparent;
+      stroke-linecap: round; /* Шугамын үзүүрийг дугуй болгох */
+    }
+    
+    @media (max-width: 600px) {
+      .letter-box {
+        width: 35px;
+        height: 35px;
+        font-size: 1.3rem;
+      }
+      
+      .key {
+        min-width: 30px;
+        height: 30px;
+        font-size: 1rem;
+      }
+      
+      .hangman-container {
+        width: 220px; /* Багасгасан */
+        height: 220px;
+      }
+       h1 {
+        font-size: 2rem;
+      }
+      .modal-content {
+        padding: 20px;
+      }
+      button {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+      }
+      .stats > div {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+      }
+    }

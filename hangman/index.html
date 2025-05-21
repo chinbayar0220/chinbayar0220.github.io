@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hangman</title>
+  <link rel="stylesheet" href="style.css">
+  
+</head>
+<body>
+  <div id="nickname-modal" class="modal">
+    <div class="modal-content">
+      <h2>Дүүжлэн  хорооё</h2>
+      <p>Тоглох нэрээ оруулна уу:</p>
+      <input type="text" id="nickname-input" placeholder="Таны нэр...">
+      <button id="start-game">Эхлэх</button>
+    </div>
+  </div>
+  
+  <div id="game-over-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <h2 id="game-over-title">Тоглоом Дууслаа</h2>
+      <p id="game-over-message"></p>
+      <p id="final-score"></p>
+      <button id="play-again">Дахин тоглох</button>
+      <button id="view-scores">Дээд оноонууд</button>
+    </div>
+  </div>
+  
+  <div class="container">
+    <header>
+      <h1>Дүүжлэн хорооё</h1>
+      <p>Үгийг зөв тааж дүүжлэгдэхээс аврагдаарай!</p>
+    </header>
+    
+    <div class="tabs">
+      <button class="tab active" data-tab="game">Тоглох</button>
+      <button class="tab" data-tab="scores">Онооны жагсаалт</button>
+    </div>
+    
+    <div id="game-tab" class="tab-content active">
+      <div class="stats">
+        <div class="timer">Хугацаа: <span id="time-remaining">01:00</span></div>
+        <div class="score">Оноо: <span id="score">0</span></div>
+      </div>
+      
+      <div class="game-area">
+        <div class="hangman-container">
+          <div class="hangman-drawing">
+            <svg viewBox="0 0 300 300">
+              <line x1="50" y1="280" x2="250" y2="280" />
+              <line x1="100" y1="280" x2="100" y2="50" />
+              <line x1="100" y1="50" x2="175" y2="50" />
+              <line x1="175" y1="50" x2="175" y2="100" />
+              <circle id="head" cx="175" cy="125" r="25" style="display: none;" />
+              <line id="body" x1="175" y1="150" x2="175" y2="210" style="display: none;" />
+              <line id="left-arm" x1="175" y1="170" x2="135" y2="150" style="display: none;" />
+              <line id="right-arm" x1="175" y1="170" x2="215" y2="150" style="display: none;" />
+              <line id="left-leg" x1="175" y1="210" x2="145" y2="250" style="display: none;" />
+              <line id="right-leg" x1="175" y1="210" x2="205" y2="250" style="display: none;" />
+            </svg>
+          </div>
+        </div>
+        
+        <div class="hint-area" id="hint-text">Хайх үгийн тайлбар энд гарна</div>
+        <div id="word-status"></div> 
+        
+        <div class="letter-container" id="letter-container"></div>
+        
+        <div class="keyboard" id="keyboard"></div>
+      </div>
+    </div>
+    
+    <div id="scores-tab" class="tab-content">
+      <h2>Шилдэг тоглогчид</h2>
+      <table id="scores-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Нэр</th>
+            <th>Оноо</th>
+          </tr>
+        </thead>
+        <tbody id="scores-body"></tbody>
+      </table>
+      <button id="clear-scores-btn">Оноог Арилгах</button>
+    </div>
+  </div>
+  <audio id="correct-sound" src="correct.mp3" preload="auto"></audio>
+  <audio id="wrong-sound" src="wrong.mp3" preload="auto"></audio>
+  <script src="script.js"></script>
+</body>
+</html>
