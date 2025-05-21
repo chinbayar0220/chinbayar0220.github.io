@@ -283,6 +283,7 @@
 
     function handleGuess(letter) {
         if (!isGameActive || guessedLetters.includes(letter) || wrongGuesses >= hangmanParts.length) {
+            endGame();
             return;
         }
         
