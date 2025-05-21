@@ -319,7 +319,7 @@
             if (wrongGuesses <= hangmanParts.length) {
                 hangmanParts[wrongGuesses - 1].style.display = 'block';
             }
-            if (wrongGuesses === hangmanParts.length) {
+            if (wrongGuesses >= hangmanParts.length) {
                 endGame(); 
             }
         }
