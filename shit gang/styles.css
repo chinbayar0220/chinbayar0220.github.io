@@ -121,7 +121,7 @@ main {
 /* Keyframes for typing */
 @keyframes typing {
   from { width: 0; }
-  to   { width: 21ch; }
+  to   { width: 37ch; }
 }
 
 /* Keyframes for cursor blink (after typing finishes) */
