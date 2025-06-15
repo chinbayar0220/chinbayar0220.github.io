@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f8ff;
+        }
+        .weather-container {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        input {
+            padding: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="weather-container">
+        <h1>Weather Information</h1>
+        <input type="text" id="cityInput" placeholder="Enter city name" />
+        <button onclick="fetchWeather()">Get Weather</button>
+        <p id="temperature">Temperature: Loading...</p>
+        <p id="description">Description: </p>
+        <p id="humidity">Humidity: </p>
+        <p id="wind-speed">Wind Speed: </p>
+    </div>
+
+    <script>
+        const apiKey = 'ac7fce0d92302b0ba3c698010e2e45d5'; // OpenWeatherMap API key
+        
+        async function fetchWeather() {
+            const city = document.getElementById('cityInput').value || 'Ulaanbaatar';
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+            
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const data = await response.json();
+                document.getElementById('temperature').textContent = `Temperature: ${data.main.temp}°C`;
+                document.getElementById('description').textContent = `Description: ${data.weather[0].description}`;
+                document.getElementById('humidity').textContent = `Humidity: ${data.main.humidity}%`;
+                document.getElementById('wind-speed').textContent = `Wind Speed: ${data.wind.speed} m/s`;
+            } catch (error) {
+                document.getElementById('temperature').textContent = 'Error loading weather data';
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>
