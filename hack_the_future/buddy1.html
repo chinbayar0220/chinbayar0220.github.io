@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CivicWatch · Buddy</title>
+
+  <!-- Tailwind (сонголтоор; зөвхөн загварт) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* line-clamp fallback (Tailwind plugin хэрэггүй) */
+    .line-clamp-3{
+      display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+    }
+    body{ background:linear-gradient(#020617,#0b1220); }
+  </style>
+</head>
+<body class="min-h-screen text-slate-100">
+  <div id="root"></div>
+
+  <!-- React 18 + ReactDOM + Babel (browser-т JSX хөрвүүлнэ) -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Таны апп -->
+  <script type="text/babel">
+    const { useEffect, useMemo, useState } = React;
+
+    // --- Mock Data -----------------------------------------------------------
+    const MPs = [
+      { id: "mp-1", name: "Б. Амаржаргал", party: "Ардчлал", region: "УБ-Чингэлтэй" },
+      { id: "mp-2", name: "Ч. Номин", party: "Шинэ ирээдүй", region: "Орхон" },
+      { id: "mp-3", name: "Д. Тэмүүлэн", party: "Хөгжил", region: "Баян-Өлгий" },
+    ];
+
+    const BILLS = [
+      {
+        id: "b-101",
+        title: "Залуучуудын стартапыг дэмжих тухай",
+        status: "Батлагдсан",
+        date: "2025-09-12",
+        summary:
+          "Стартапын хөрөнгө оруулалт, татварын хөнгөлөлт, инкубаторын санхүүжилтийг зохицуулна.",
+        sponsors: ["mp-1", "mp-2"],
+        rationale: [
+          "Ажилгүйдлийг бууруулах, шинэлэг бизнесийг өсгөх",
+          "Өрсөлдөх чадварыг нэмэгдүүлэх",
+        ],
+        impact: ["20,000 залуучууд хөнгөлөлт эдэлнэ", "500+ стартап бүртгүүлнэ"],
+        tags: ["стартап", "татвар", "залуучууд"],
+        links: { pdf: "#", source: "#" },
+      },
+      {
+        id: "b-102",
+        title: "Их, дээд сургуулийн ил тод байдлын тухай",
+        status: "Хэлэлцэж байгаа",
+        date: "2025-10-22",
+        summary:
+          "Санхүү, тэтгэлэг, судалгааны тайланг нээлттэй мэдээлэх үүрэгжүүлнэ.",
+        sponsors: ["mp-2"],
+        rationale: ["Төсвийн хяналтыг сайжруулах", "Оюутны оролцоог нэмэгдүүлэх"],
+        impact: ["Тэтгэлгийн мэдээлэл нэг цонхоор", "Шалгаруулалт ил тод болно"],
+        tags: ["их сургууль", "ил тод байдал"],
+        links: { pdf: "#", source: "#" },
+      },
+      {
+        id: "b-103",
+        title: "Төрийн тэтгэлгийн зохистой хуваарилалтын тухай",
+        status: "Батлагдсан",
+        date: "2025-08-03",
+        summary:
+          "Нэг хүнд ноогдох дээд хэмжээг тогтоож, олон оюутанд хүргэх зарчимд шилжинэ.",
+        sponsors: ["mp-3"],
+        rationale: ["Үр ашгийг нэмэгдүүлэх", "Тэгш хүртээмж"],
+        impact: ["15,000+ оюутан хамрагдана", "Шалгаруулалт онооны матрицаар"],
+        tags: ["тэтгэлэг", "үр ашиг"],
+        links: { pdf: "#", source: "#" },
+      },
+    ];
+
+    const PROGRAMS = [
+      {
+        id: "p-1",
+        title: "Илгээлт-2100 тэтгэлгийн шинэ загвар",
+        approved: true,
+        date: "2025-07-15",
+        by: ["mp-3"],
+        summary:
+          "Дотоодын их сургуулиудад чиглэсэн дэд сан нэвтрүүлж, 4 сая₮/оюутан/жил жишигтэй тэтгэлэг олгоно.",
+        metrics: { budget: 62000000000, tuition: 4000000 },
+      },
+      {
+        id: "p-2",
+        title: "Ил тод шалгаруулалтын нэгдсэн портал",
+        approved: false,
+        date: "2025-10-02",
+        by: ["mp-2"],
+        summary: "feedback.gov.mn төрлийн нэгдсэн санал, шүүмжийн систем.",
+        metrics: { budget: 1200000000 },
+      },
+    ];
+
+    // --- Utilities -----------------------------------------------------------
+    const isClient = typeof window !== "undefined";
+    const safeLS = {
+      get: (k) => (isClient && window.localStorage ? window.localStorage.getItem(k) : null),
+      set: (k, v) => { if (isClient && window.localStorage) window.localStorage.setItem(k, v); },
+    };
+    const fmt = (n) => new Intl.NumberFormat("mn-MN").format(n);
+    const day = (d) => new Date(d);
+
+    // --- Components ----------------------------------------------------------
+    function Pill({ children }) {
+      return (
+        <span className="px-2 py-1 rounded-full border border-slate-700 bg-slate-900/60 text-slate-300 text-xs">
+          {children}
+        </span>
+      );
+    }
+
+    function Section({ title, children, actions }) {
+      return (
+        <section className="border border-slate-800 rounded-2xl bg-slate-900/50 p-5">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-lg font-semibold">{title}</h3>
+            {actions}
+          </div>
+          <div className="mt-3">{children}</div>
+        </section>
+      );
+    }
+
+    function SearchBar({ q, setQ, children }) {
+      return (
+        <div className="flex flex-wrap gap-2 items-center">
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Хайх (гарчиг, шошго, тайлбар)"
+            className="min-w-[240px] flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100"
+          />
+          {children}
+        </div>
+      );
+    }
+
+    function LikeButton({ id }) {
+      const key = `cw-like-${id}`;
+      const [likes, setLikes] = useState(() => Number(safeLS.get(key) || 0));
+      return (
+        <button
+          onClick={() => {
+            const v = likes + 1;
+            setLikes(v);
+            safeLS.set(key, String(v));
+          }}
+          className="inline-flex items-center gap-2 border border-slate-700 rounded-xl px-3 py-1.5 bg-slate-900 hover:bg-slate-800 transition"
+        >
+          👍 <span className="font-semibold">{likes}</span>
+        </button>
+      );
+    }
+
+    function FeedbackForm({ subjectId, compact = false }) {
+      const key = `cw-fb-${subjectId}`;
+      const [list, setList] = useState(() => JSON.parse(safeLS.get(key) || "[]"));
+      const [txt, setTxt] = useState("");
+      const [rating, setRating] = useState(0);
+      function submit() {
+        if (!txt.trim()) return;
+        const entry = { txt, rating, at: new Date().toISOString() };
+        const next = [entry, ...list];
+        setList(next);
+        safeLS.set(key, JSON.stringify(next));
+        setTxt("");
+        setRating(0);
+      }
+      return (
+        <div className={`border border-slate-800 rounded-xl p-3 ${compact ? "bg-slate-900/40" : "bg-slate-900/60"}`}>
+          <div className="flex items-center justify-between gap-2">
+            <strong>Feedback</strong>
+            <LikeButton id={subjectId} />
+          </div>
+          <div className="mt-2 flex items-center gap-2">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <button
+                key={i}
+                onClick={() => setRating(i)}
+                className={`w-8 h-8 rounded-full border ${
+                  rating >= i ? "bg-emerald-500/30 border-emerald-400" : "bg-slate-950 border-slate-700"
+                }`}
+                title={`${i} / 5`}
+              />
+            ))}
+            <input
+              value={txt}
+              onChange={(e) => setTxt(e.target.value)}
+              placeholder="Санал, шүүмжээ бичнэ үү"
+              className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-100"
+            />
+            <button onClick={submit} className="px-3 py-2 rounded-xl bg-cyan-500/20 border border-cyan-400 text-cyan-100 font-semibold">
+              Илгээх
+            </button>
+          </div>
+          {list.length > 0 && (
+            <ul className="mt-3 space-y-2">
+              {list.map((it, i) => (
+                <li key={i} className="text-sm text-slate-300">
+                  <span className="text-emerald-300">{"★".repeat(it.rating)}</span> {it.txt}
+                  <span className="text-slate-500"> — {new Date(it.at).toLocaleString()}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      );
+    }
+
+    // Drawer ------------------------------------------------------------------
+    function Drawer({ open, onClose, bill }) {
+      useEffect(() => {
+        function esc(e) { if (e.key === "Escape") onClose(); }
+        document.addEventListener("keydown", esc);
+        return () => document.removeEventListener("keydown", esc);
+      }, [onClose]);
+      if (!open || !bill) return null;
+      const sponsors = bill.sponsors.map((id) => MPs.find((m) => m.id === id)?.name).filter(Boolean).join(", ");
+      return (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+          <div className="absolute right-0 top-0 h-full w-full sm:w-[560px] bg-slate-950 border-l border-slate-800 p-5 overflow-y-auto">
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="text-xl font-bold">{bill.title}</h3>
+              <button onClick={onClose} className="px-3 py-1.5 rounded-lg border border-slate-700">✕</button>
+            </div>
+            <div className="mt-2 flex gap-2 flex-wrap">
+              <Pill>{bill.status}</Pill>
+              <Pill>{new Date(bill.date).toLocaleDateString()}</Pill>
+              {bill.tags.map((t) => <Pill key={t}>#{t}</Pill>)}
+            </div>
+            <p className="mt-3 text-slate-300">{bill.summary}</p>
+            <Section title="Санал гаргасан гишүүд"><p className="text-slate-300">{sponsors || "—"}</p></Section>
+            <Section title="Үндэслэл">
+              <ul className="list-disc ml-5 text-slate-300">
+                {bill.rationale.map((r, i) => <li key={i}>{r}</li>)}
+              </ul>
+            </Section>
+            <Section title="Хүлээгдэж буй нөлөө">
+              <ul className="list-disc ml-5 text-slate-300">
+                {bill.impact.map((r, i) => <li key={i}>{r}</li>)}
+              </ul>
+            </Section>
+            <Section title="Баримт бичиг">
+              <div className="flex gap-2 flex-wrap">
+                <a className="px-3 py-2 rounded-xl border border-slate-700" href={bill.links.pdf}>PDF</a>
+                <a className="px-3 py-2 rounded-xl border border-slate-700" href={bill.links.source}>Эх сурвалж</a>
+              </div>
+            </Section>
+            <FeedbackForm subjectId={bill.id} />
+          </div>
+        </div>
+      );
+    }
+
+    // Pages -------------------------------------------------------------------
+    function BillsPage() {
+      const [q, setQ] = useState("");
+      const [status, setStatus] = useState("Бүгд");
+      const [sort, setSort] = useState("Шинэ");
+      const [open, setOpen] = useState(null);
+
+      const data = useMemo(() => {
+        return BILLS
+          .filter((b) =>
+            (status === "Бүгд" || b.status === status) &&
+            (q === "" ||
+              b.title.toLowerCase().includes(q.toLowerCase()) ||
+              b.summary.toLowerCase().includes(q.toLowerCase()) ||
+              b.tags.some((t) => t.toLowerCase().includes(q.toLowerCase())))
+          )
+          .sort((a, b) => (sort === "Шинэ" ? day(b.date) - day(a.date) : day(a.date) - day(b.date)));
+      }, [q, status, sort]);
+
+      return (
+        <div className="space-y-4">
+          <SearchBar q={q} setQ={setQ}>
+            <select value={status} onChange={(e) => setStatus(e.target.value)} className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2">
+              {["Бүгд", "Батлагдсан", "Хэлэлцэж байгаа"].map((s) => <option key={s}>{s}</option>)}
+            </select>
+            <select value={sort} onChange={(e) => setSort(e.target.value)} className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2">
+              {["Шинэ", "Хуучин"].map((s) => <option key={s}>{s}</option>)}
+            </select>
+          </SearchBar>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {data.map((b) => (
+              <div key={b.id} className="border border-slate-800 rounded-2xl p-4 bg-slate-900/60 hover:bg-slate-900">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-semibold pr-2">{b.title}</h4>
+                  <Pill>{b.status}</Pill>
+                </div>
+                <p className="text-slate-300 mt-1 line-clamp-3">{b.summary}</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {b.tags.map((t) => <Pill key={t}>#{t}</Pill>)}
+                </div>
+                <div className="mt-3 flex items-center justify-between">
+                  <button onClick={() => setOpen(b)} className="px-3 py-2 rounded-xl bg-cyan-500/20 border border-cyan-400 text-cyan-100 font-semibold">Дэлгэрэнгүй</button>
+                  <FeedbackForm subjectId={`card-${b.id}`} compact />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Drawer open={!!open} onClose={() => setOpen(null)} bill={open} />
+        </div>
+      );
+    }
+
+    function ProgramsPage() {
+      const latest = [...PROGRAMS].sort((a, b) => day(b.date) - day(a.date));
+      return (
+        <div className="space-y-4">
+          {latest.map((p) => (
+            <Section key={p.id} title={p.title} actions={<Pill>{p.approved ? "Батлагдсан" : "Санал"}</Pill>}>
+              <div className="flex flex-col gap-2">
+                <div className="text-slate-300">{p.summary}</div>
+                <div className="flex gap-2 flex-wrap">
+                  {p.by.map((id) => <Pill key={id}>{MPs.find((m) => m.id === id)?.name}</Pill>)}
+                  <Pill>{new Date(p.date).toLocaleDateString()}</Pill>
+                </div>
+                {p.metrics?.budget && (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                    <div className="border border-slate-800 rounded-xl p-3"><div className="text-slate-400">Төсөв</div><div className="font-bold">{fmt(p.metrics.budget)} ₮</div></div>
+                    {p.metrics.tuition && (
+                      <div className="border border-slate-800 rounded-xl p-3"><div className="text-slate-400">Жилийн төлбөр</div><div className="font-bold">{fmt(p.metrics.tuition)} ₮</div></div>
+                    )}
+                    {p.metrics.tuition && (
+                      <div className="border border-slate-800 rounded-xl p-3"><div className="text-slate-400">Бүрэн тэтгэлэг</div><div className="font-bold">{fmt(Math.floor(p.metrics.budget / p.metrics.tuition))} оюутан</div></div>
+                    )}
+                  </div>
+                )}
+                <FeedbackForm subjectId={p.id} />
+              </div>
+            </Section>
+          ))}
+        </div>
+      );
+    }
+
+    function MPsPage() {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {MPs.map((m) => (
+            <div key={m.id} className="border border-slate-800 rounded-2xl p-4 bg-slate-900/60">
+              <h4 className="font-semibold">{m.name}</h4>
+              <div className="text-slate-400 text-sm">{m.party} · {m.region}</div>
+              <Section title="Оролцсон санаачилга">
+                <ul className="list-disc ml-5 text-slate-300">
+                  {BILLS.filter((b) => b.sponsors.includes(m.id)).map((b) => (
+                    <li key={b.id}>{b.title} <Pill>{b.status}</Pill></li>
+                  ))}
+                </ul>
+              </Section>
+              <FeedbackForm subjectId={`mp-${m.id}`} compact />
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // --- Router (hash) -------------------------------------------------------
+    const routes = [
+      { key: "bills", label: "Хууль/Төсөл" },
+      { key: "programs", label: "Хөтөлбөр" },
+      { key: "mps", label: "Гишүүд" },
+    ];
+
+    function useHashRoute() {
+      const [hash, setHash] = useState(() => (isClient ? window.location.hash.replace("#", "") || "bills" : "bills"));
+      useEffect(() => {
+        if (!isClient) return;
+        const on = () => setHash(window.location.hash.replace("#", "") || "bills");
+        window.addEventListener("hashchange", on);
+        return () => window.removeEventListener("hashchange", on);
+      }, []);
+      return [hash, (h) => { if (isClient) window.location.hash = h; }];
+    }
+
+    function App() {
+      const [hash, setHash] = useHashRoute();
+      return (
+        <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900 text-slate-100">
+          <div className="max-w-6xl mx-auto px-4 py-6">
+            <header className="border border-slate-800 rounded-2xl p-4 bg-slate-900/50">
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-full border border-slate-700 bg-slate-900/70 text-slate-300 text-xs">
+                    CivicWatch · Hackathon prototype
+                  </div>
+                  <h1 className="mt-2 text-2xl font-extrabold">
+                    🏛️ УИХ-ын гишүүдийн санаачилга, батлагдсан хөтөлбөрийг <span className="text-cyan-300">нэг цонхноос</span>
+                  </h1>
+                  <p className="text-slate-400">Сүүлд батлагдсан, хэлэлцэж буй хууль/төсөл, аль гишүүн ямар шийдэлд оролцсоныг харж, шууд feedback өгөөрэй.</p>
+                </div>
+                <nav className="flex gap-2">
+                  {routes.map((r) => (
+                    <button
+                      key={r.key}
+                      onClick={() => setHash(r.key)}
+                      className={`px-3 py-2 rounded-xl border ${hash === r.key ? "border-cyan-400 bg-cyan-500/20" : "border-slate-700 bg-slate-900"}`}
+                    >
+                      {r.label}
+                    </button>
+                  ))}
+                  <a className="px-3 py-2 rounded-xl border border-slate-700 bg-slate-900" href="#" onClick={(e)=>{e.preventDefault();window.print();}}>🖨️ PDF</a>
+                </nav>
+              </div>
+            </header>
+
+              <main className="mt-5 space-y-4">
+                {hash === "bills" && <BillsPage />}
+                {hash === "programs" && <ProgramsPage />}
+                {hash === "mps" && <MPsPage />}
+              </main>
+
+              <footer className="mt-6 text-sm text-slate-500">
+                <p>⚠️ Загварчилсан өгөгдөл ашигласан. Албан баримтыг холбохдоо эх сурвалж, огноо, PDF холбоосыг бүртгэнэ.</p>
+              </footer>
+            </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
+  </script>
+</body>
+</html>

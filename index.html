@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <title>TomorePlay Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /*
+      TomorePlay Admin System (Complete)
+
+      This file implements a self‑contained admin dashboard for a PlayStation game centre.
+      It follows the dark theme design of the original prototype and adds full functionality:
+        • 11 stations (3 VIP, 8 normal) with real‑time timers
+        • Session start/pause/resume/stop with game and player selection
+        • Membership registration and discount (20% off for members)
+        • Dynamic price calculation (VIP: 6000₮ per controller per hour, Normal: 5000₮)
+        • Daily revenue tracking and session logging (with 7‑day expiry)
+        • Passcode‑protected login and passcode‑protected report view
+        • Separate report modal showing today/yesterday totals and session list
+
+      Everything runs locally in the browser using HTML/CSS/JavaScript only and
+      stores data in localStorage.
+    */
+
+    :root {
+      /* Colour palette inspired by the original dark prototype */
+      --bg-color: #0f121a;
+      --card-bg: #191e2c;
+      --card-border: #2a2f45;
+      --primary-color: #00bfff; /* Neon blue for active buttons */
+      --accent-color: #ff004f; /* Vibrant pink-red for danger buttons */
+      --vip-color: #d4af37;   /* Gold for VIP borders */
+      --text-color: #e0e3ea;  /* Light text colour */
+      --paused-color: #f3a712; /* Amber for paused status */
+      --scrollbar-bg: #1c2130;
+      --scrollbar-thumb: #374366;
+
+      font-size: 16px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Reset & body */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      min-height: 100vh;
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(25, 30, 44, 0.95);
+      border-bottom: 2px solid var(--primary-color);
+      backdrop-filter: blur(4px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header h1 {
+      font-size: 1.6rem;
+      letter-spacing: 1px;
+      margin-right: 1rem;
+    }
+    header .meta {
+      font-size: 0.9rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    main.dashboard {
+      flex: 1;
+      display: flex;
+      gap: 2rem;
+      padding: 1.5rem 2rem;
+    }
+    .column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    /* Station card styling */
+    .station {
+      position: relative;
+      padding: 1rem;
+      background: var(--card-bg);
+      border: 2px solid var(--card-border);
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 170px;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+      overflow: hidden;
+    }
+    .station.big {
+      height: 220px;
+    }
+    .station:hover {
+      transform: translateY(-3px);
+    }
+    .station.vip {
+      border-color: var(--vip-color);
+    }
+    .station.busy {
+      border-color: var(--primary-color);
+    }
+    .station.paused {
+      border-color: var(--paused-color);
+    }
+    .station-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.2rem;
+    }
+    .station-header .title {
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+    .station-header .status {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      opacity: 0.75;
+    }
+    .station-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 0.4rem;
+    }
+    .station-body .timer {
+      font-size: 1.6rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .station-body .game {
+      display: flex;
+      align-items: center;
+      font-size: 1rem;
+      gap: 0.4rem;
+    }
+    .station-body .controllers {
+      font-size: 1rem;
+    }
+    .station-footer {
+      display: flex;
+      gap: 0.4rem;
+    }
+    .station button {
+      flex: 1;
+      padding: 0.35rem 0.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: opacity 0.15s ease;
+    }
+    .station button.start {
+      background: var(--primary-color);
+      color: #000;
+    }
+    .station button.stop {
+      background: var(--accent-color);
+      color: #fff;
+    }
+    .station button.pause {
+      background: var(--paused-color);
+      color: #000;
+    }
+    .station button.resume {
+      background: var(--primary-color);
+      color: #000;
+    }
+    .station button:hover {
+      opacity: 0.85;
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--scrollbar-bg);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--scrollbar-thumb);
+      border-radius: 3px;
+    }
+
+    /* Modal overlay and container */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    .modal-container {
+      background: var(--card-bg);
+      border: 2px solid var(--primary-color);
+      border-radius: 8px;
+      padding: 1rem;
+      width: 320px;
+      max-width: 90%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      font-size: 0.95rem;
+    }
+    .modal-container h2 {
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+      font-size: 1.2rem;
+    }
+    .modal-container label {
+      display: block;
+      margin-bottom: 0.3rem;
+      font-size: 0.85rem;
+    }
+    .modal-container input[type="number"],
+    .modal-container input[type="text"],
+    .modal-container select {
+      width: 100%;
+      padding: 0.4rem;
+      margin-bottom: 0.7rem;
+      border: none;
+      border-radius: 4px;
+      background: #22273a;
+      color: var(--text-color);
+      font-size: 0.9rem;
+    }
+    .modal-container .actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .modal-container .actions button {
+      flex: 1;
+      padding: 0.45rem 0.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .modal-container .actions .confirm {
+      background: var(--primary-color);
+      color: #000;
+    }
+    .modal-container .actions .cancel {
+      background: var(--accent-color);
+      color: #fff;
+    }
+
+    /* Login overlay */
+    #loginOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    #loginOverlay.hidden { display: none; }
+    .login-card {
+      background: var(--card-bg);
+      border: 2px solid var(--primary-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+      width: 280px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      text-align: center;
+    }
+    .login-card h2 {
+      margin: 0 0 0.5rem;
+      font-size: 1.3rem;
+    }
+    .login-card p {
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 1rem;
+    }
+    .login-card input {
+      width: 100%;
+      padding: 0.5rem;
+      border: none;
+      border-radius: 4px;
+      background: #22273a;
+      color: var(--text-color);
+      font-size: 1rem;
+      margin-bottom: 0.7rem;
+      text-align: center;
+    }
+    .login-card button {
+      width: 100%;
+      padding: 0.5rem;
+      border: none;
+      border-radius: 4px;
+      background: var(--primary-color);
+      color: #000;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .login-card .error {
+      color: var(--accent-color);
+      font-size: 0.8rem;
+      display: none;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Admin sidebar for membership */
+    .sidebar {
+      width: 260px;
+      background: var(--card-bg);
+      border-left: 2px solid var(--card-border);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      overflow-y: auto;
+    }
+    .sidebar-section-title {
+      font-size: 1rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    .member-form label {
+      font-size: 0.8rem;
+      margin-bottom: 0.2rem;
+      display: block;
+    }
+    .member-form input {
+      width: 100%;
+      padding: 0.4rem;
+      margin-bottom: 0.5rem;
+      border: none;
+      border-radius: 4px;
+      background: #22273a;
+      color: var(--text-color);
+      font-size: 0.9rem;
+    }
+    .member-form button {
+      padding: 0.45rem;
+      border: none;
+      border-radius: 4px;
+      background: var(--primary-color);
+      color: #000;
+      font-size: 0.9rem;
+      width: 100%;
+      cursor: pointer;
+    }
+    .members-list {
+      font-size: 0.85rem;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .member-item {
+      padding: 0.3rem 0;
+      border-bottom: 1px dashed var(--card-border);
+    }
+    .member-item:last-child {
+      border-bottom: none;
+    }
+
+    /* Report modal styling */
+    .report-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 80;
+    }
+    .report-container {
+      background: var(--card-bg);
+      border: 2px solid var(--primary-color);
+      border-radius: 8px;
+      padding: 1rem;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90%;
+      overflow-y: auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+    }
+    .report-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .report-header h2 {
+      margin: 0;
+      font-size: 1.3rem;
+    }
+    .report-body {
+      font-size: 0.85rem;
+    }
+    .report-totals {
+      margin-bottom: 0.7rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 0.7rem;
+    }
+    .report-totals span {
+      display: inline-block;
+      margin-right: 1.5rem;
+    }
+    .report-list .session-row {
+      padding: 0.4rem 0;
+      border-bottom: 1px dashed var(--card-border);
+    }
+    .report-list .session-row:last-child {
+      border-bottom: none;
+    }
+    .report-close {
+      background: var(--accent-color);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 0.4rem 0.6rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    /* Notification toast */
+    .toast {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      background: rgba(0, 0, 0, 0.85);
+      color: #fff;
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 90;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 900px) {
+      main.dashboard {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        border-left: none;
+        border-top: 2px solid var(--card-border);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Login overlay (shown on initial load) -->
+  <div id="loginOverlay">
+    <div class="login-card">
+      <h2>Нэвтрэх</h2>
+      <p>Систем ашиглахын тулд нууц код оруулна уу.</p>
+      <div class="error" id="loginError">Нууц код буруу байна.</div>
+      <input type="password" id="loginPass" placeholder="Нууц код" autocomplete="off" />
+      <button id="loginBtn">Нэвтрэх</button>
+    </div>
+  </div>
+
+  <!-- Main application container (hidden until login) -->
+  <div id="app" style="display:none;">
+    <header>
+      <h1>TomorePlay Admin</h1>
+      <div class="meta">
+        <span id="dateLabel"></span>
+        <span>Өдрийн орлого: ₮<span id="todayRevenue">0</span></span>
+        <button id="reportBtn" style="background: none; border: 1px solid var(--primary-color); color: var(--primary-color); padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Тайлан харах</button>
+      </div>
+    </header>
+    <div style="display:flex; flex:1;">
+      <main class="dashboard" style="flex:1;">
+        <!-- Columns for stations -->
+        <div class="column" id="leftColumn">
+          <!-- VIP #1, VIP #2, VIP #3 (big) cards inserted by JS -->
+        </div>
+        <div class="column" id="rightColumn">
+          <!-- Normal stations #4-#11 inserted by JS -->
+        </div>
+      </main>
+      <!-- Sidebar for membership registration and member list -->
+      <aside class="sidebar" id="sidebar">
+        <div>
+          <div class="sidebar-section-title">Гишүүн бүртгэл</div>
+          <form id="memberForm" class="member-form" onsubmit="return false;">
+            <label for="memberName">Нэр</label>
+            <input type="text" id="memberName" placeholder="Гишүүний нэр" />
+            <label for="memberPhone">Утас</label>
+            <input type="text" id="memberPhone" placeholder="Утасны дугаар" />
+            <label for="memberDiscount">Хөнгөлөлт %</label>
+            <input type="number" id="memberDiscount" min="0" max="100" value="20" />
+            <button id="addMemberBtn">Гишүүн нэмэх</button>
+          </form>
+        </div>
+        <div>
+          <div class="sidebar-section-title">Гишүүдийн жагсаалт</div>
+          <div class="members-list" id="membersList"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Start session modal -->
+  <div class="modal-overlay" id="startModal">
+    <div class="modal-container">
+      <h2>Сесс эхлүүлэх</h2>
+      <div id="startStationLabel" style="font-size:0.85rem; margin-bottom:0.3rem; color:#aaa;"></div>
+      <label for="gameSelect">Тоглоом сонгох:</label>
+      <select id="gameSelect">
+        <option value="">Сонгоогүй</option>
+        <option value="NBA 2K">NBA 2K</option>
+        <option value="FIFA">FIFA</option>
+        <option value="UFC">UFC</option>
+        <option value="Бусад">Бусад</option>
+      </select>
+      <label for="playerCount">Контроллерын тоо:</label>
+      <input type="number" id="playerCount" min="1" max="4" value="1" />
+      <div class="actions">
+        <button class="confirm" id="confirmStartBtn">Эхлүүлэх</button>
+        <button class="cancel" id="cancelStartBtn">Цуцлах</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Billing modal (payment) -->
+  <div class="modal-overlay" id="billingModal">
+    <div class="modal-container">
+      <h2>Төлбөр тооцоо</h2>
+      <div id="billingStationInfo" style="font-size:0.85rem; color:#aaa; margin-bottom:0.4rem;"></div>
+      <div style="margin-bottom:0.4rem; font-size:0.85rem;">
+        Тоглосон хугацаа: <span id="billingDuration">0:00</span>
+      </div>
+      <div style="margin-bottom:0.4rem; font-size:0.85rem;">
+        Үндсэн үнэ: ₮<span id="billingBase">0</span>
+      </div>
+      <label style="margin-top:0.4rem;">Гишүүн үү?</label>
+      <select id="billingMemberSelect">
+        <option value="no">Үгүй</option>
+        <option value="yes">Тийм</option>
+      </select>
+      <div id="billingMemberPhoneContainer" style="display:none; margin-top:0.4rem;">
+        <label for="billingMemberPhone">Гишүүний утас:</label>
+        <input type="text" id="billingMemberPhone" placeholder="Утас" />
+      </div>
+      <div id="billingDiscountInfo" style="display:none; font-size:0.85rem; margin-top:0.4rem;">
+        Хөнгөлөлт: <span id="billingDiscount">0</span>% (₮<span id="billingDiscountAmount">0</span>)
+      </div>
+      <div style="margin-top:0.4rem; font-size:0.9rem; font-weight:bold;">
+        Төлөх дүн: ₮<span id="billingFinal">0</span>
+      </div>
+      <div class="actions" style="margin-top:0.6rem;">
+        <button class="confirm" id="confirmBillingBtn">Төлөх</button>
+        <button class="cancel" id="cancelBillingBtn">Болих</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report modal (requires passcode) -->
+  <div class="report-overlay" id="reportOverlay">
+    <div class="modal-container" style="width: 320px;">
+      <h2>Тайлан нээх</h2>
+      <p style="font-size:0.85rem; color:#aaa;">Тайлан үзэхийн тулд нууц код оруулна уу.</p>
+      <div class="error" id="reportCodeError" style="font-size:0.8rem; color: var(--accent-color); display:none;">Код буруу байна.</div>
+      <input type="password" id="reportCodeInput" placeholder="Passcode" />
+      <div class="actions" style="margin-top:0.7rem;">
+        <button class="confirm" id="reportCodeConfirm">Нээх</button>
+        <button class="cancel" id="reportCodeCancel">Цуцлах</button>
+      </div>
+    </div>
+  </div>
+  <!-- Actual report view (inside overlay) -->
+  <div class="report-overlay" id="reportView" style="display:none;">
+    <div class="report-container">
+      <div class="report-header">
+        <h2>Тайлан</h2>
+        <button class="report-close" id="closeReport">X</button>
+      </div>
+      <div class="report-body">
+        <div class="report-totals">
+          <span>Өнөөдрийн орлого: ₮<span id="reportTodayTotal">0</span></span>
+          <span>Өчигдрийн орлого: ₮<span id="reportYesterdayTotal">0</span></span>
+        </div>
+        <div class="report-list" id="reportList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast">Үйлдэл амжилттай</div>
+
+  <script>
+  /*
+    TomorePlay Admin JS
+
+    This script powers the entire admin system: login handling, station management,
+    membership registration, billing, session logging, report view, and data persistence.
+    All data is stored in localStorage (if available); fallback to memory if not.
+  */
+  (function() {
+    'use strict';
+
+    // === Configuration ===
+    const PASSCODE = '0220';
+    const NORMAL_RATE = 5000; // normal station per controller per hour
+    const VIP_RATE = 6000;    // VIP station per controller per hour
+    const DISCOUNT_PERCENT = 20; // membership discount
+    const LOG_EXPIRY_DAYS = 7; // sessions older than 7 days are removed
+
+    // === DOM references ===
+    const loginOverlay = document.getElementById('loginOverlay');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginPass = document.getElementById('loginPass');
+    const loginError = document.getElementById('loginError');
+    const appContainer = document.getElementById('app');
+    const dateLabel = document.getElementById('dateLabel');
+    const todayRevenueElem = document.getElementById('todayRevenue');
+    const reportBtn = document.getElementById('reportBtn');
+    const leftColumn = document.getElementById('leftColumn');
+    const rightColumn = document.getElementById('rightColumn');
+    const startModal = document.getElementById('startModal');
+    const startStationLabel = document.getElementById('startStationLabel');
+    const gameSelect = document.getElementById('gameSelect');
+    const playerCountInput = document.getElementById('playerCount');
+    const confirmStartBtn = document.getElementById('confirmStartBtn');
+    const cancelStartBtn = document.getElementById('cancelStartBtn');
+    const billingModal = document.getElementById('billingModal');
+    const billingStationInfo = document.getElementById('billingStationInfo');
+    const billingDuration = document.getElementById('billingDuration');
+    const billingBase = document.getElementById('billingBase');
+    const billingMemberSelect = document.getElementById('billingMemberSelect');
+    const billingMemberPhoneContainer = document.getElementById('billingMemberPhoneContainer');
+    const billingMemberPhone = document.getElementById('billingMemberPhone');
+    const billingDiscountInfo = document.getElementById('billingDiscountInfo');
+    const billingDiscount = document.getElementById('billingDiscount');
+    const billingDiscountAmount = document.getElementById('billingDiscountAmount');
+    const billingFinal = document.getElementById('billingFinal');
+    const confirmBillingBtn = document.getElementById('confirmBillingBtn');
+    const cancelBillingBtn = document.getElementById('cancelBillingBtn');
+    const reportOverlay = document.getElementById('reportOverlay');
+    const reportCodeInput = document.getElementById('reportCodeInput');
+    const reportCodeError = document.getElementById('reportCodeError');
+    const reportCodeConfirm = document.getElementById('reportCodeConfirm');
+    const reportCodeCancel = document.getElementById('reportCodeCancel');
+    const reportView = document.getElementById('reportView');
+    const reportTodayTotal = document.getElementById('reportTodayTotal');
+    const reportYesterdayTotal = document.getElementById('reportYesterdayTotal');
+    const reportList = document.getElementById('reportList');
+    const closeReportBtn = document.getElementById('closeReport');
+    const toast = document.getElementById('toast');
+    // Membership form
+    const memberForm = document.getElementById('memberForm');
+    const memberNameInput = document.getElementById('memberName');
+    const memberPhoneInput = document.getElementById('memberPhone');
+    const memberDiscountInput = document.getElementById('memberDiscount');
+    const addMemberBtn = document.getElementById('addMemberBtn');
+    const membersList = document.getElementById('membersList');
+
+    // === Data storage ===
+    // We store sessions and members in localStorage if available. If not, fallback to in‑memory arrays.
+    const supportsLocalStorage = (function() {
+      try {
+        const testKey = '__test_key';
+        localStorage.setItem(testKey, 'x');
+        localStorage.removeItem(testKey);
+        return true;
+      } catch (e) { return false; }
+    })();
+
+    function loadFromStorage(key, defaultValue) {
+      if (!supportsLocalStorage) return defaultValue;
+      const raw = localStorage.getItem(key);
+      if (!raw) return defaultValue;
+      try {
+        return JSON.parse(raw);
+      } catch (e) {
+        return defaultValue;
+      }
+    }
+    function saveToStorage(key, value) {
+      if (!supportsLocalStorage) return;
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+    // Keys
+    const SESSIONS_KEY = 'tp_sessions_v3';
+    const MEMBERS_KEY  = 'tp_members_v3';
+
+    // Session logs (array of objects)
+    let sessionLogs = loadFromStorage(SESSIONS_KEY, []);
+    // Members (array of objects with name, phone, discount)
+    let memberList = loadFromStorage(MEMBERS_KEY, []);
+
+    // Remove expired sessions (older than LOG_EXPIRY_DAYS)
+    function purgeOldSessions() {
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - LOG_EXPIRY_DAYS);
+      const filtered = sessionLogs.filter(item => {
+        const date = new Date(item.date);
+        return date >= cutoffDate;
+      });
+      if (filtered.length !== sessionLogs.length) {
+        sessionLogs = filtered;
+        saveToStorage(SESSIONS_KEY, sessionLogs);
+      }
+    }
+
+    // === Station data and logic ===
+    const stations = {};
+    /* Station structure:
+      { id, type ('vip' or 'normal'), name,
+        busy: bool, paused: bool, startTime: number or null,
+        elapsed: seconds, game: string, players: number,
+        timerId: interval reference }
+    */
+
+    // Mapping game names to emoji icons
+    const gameIcons = {
+      'NBA 2K': '🏀',
+      'FIFA': '⚽',
+      'UFC': '🥊',
+      'Бусад': '🎮'
+    };
+
+    // Create station card element from template
+    function createStationElement(id, name, type, big = false) {
+      const div = document.createElement('div');
+      div.classList.add('station');
+      if (big) div.classList.add('big');
+      if (type === 'vip') div.classList.add('vip');
+      div.dataset.id = id;
+      div.innerHTML = `
+        <div class="station-header">
+          <span class="title">${name}</span>
+          <span class="status">Сул</span>
+        </div>
+        <div class="station-body">
+          <span class="timer">0:00:00</span>
+          <span class="game">🎮 Тоглоом сонгоогүй</span>
+          <span class="controllers">1 🎮</span>
+        </div>
+        <div class="station-footer">
+          <button class="start">Эхлүүлэх</button>
+          <button class="pause" style="display:none;">Түр зогсоох</button>
+          <button class="resume" style="display:none;">Үргэлжлүүлэх</button>
+          <button class="stop" style="display:none;">Зогсоох</button>
+        </div>`;
+      return div;
+    }
+
+    // Initialize station objects and append cards
+    function initStations() {
+      // VIP stations (#1, #2, #3). #3 is bigger card.
+      const vipNames = ['VIP #1', 'VIP #2', 'VIP #3'];
+      for (let i = 1; i <= 3; i++) {
+        const name = vipNames[i-1];
+        const elem = createStationElement(i, name, 'vip', i === 3);
+        leftColumn.appendChild(elem);
+        stations[i] = {
+          id: i,
+          type: 'vip',
+          name: name,
+          busy: false,
+          paused: false,
+          startTime: null,
+          elapsed: 0,
+          game: '',
+          players: 1,
+          timerId: null
+        };
+      }
+      // Normal stations (#4–#11)
+      for (let i = 4; i <= 11; i++) {
+        const name = `PS #${i}`;
+        const elem = createStationElement(i, name, 'normal');
+        rightColumn.appendChild(elem);
+        stations[i] = {
+          id: i,
+          type: 'normal',
+          name: name,
+          busy: false,
+          paused: false,
+          startTime: null,
+          elapsed: 0,
+          game: '',
+          players: 1,
+          timerId: null
+        };
+      }
+      // Attach event listeners for buttons on all stations
+      attachStationListeners();
+    }
+
+    // Update the appearance of a station card based on its state
+    function updateStationUI(id) {
+      const station = stations[id];
+      const elem = document.querySelector(`.station[data-id="${id}"]`);
+      if (!elem) return;
+      const statusElem = elem.querySelector('.status');
+      const timerElem = elem.querySelector('.timer');
+      const gameElem = elem.querySelector('.game');
+      const ctrlElem = elem.querySelector('.controllers');
+      const startBtn = elem.querySelector('button.start');
+      const pauseBtn = elem.querySelector('button.pause');
+      const resumeBtn = elem.querySelector('button.resume');
+      const stopBtn = elem.querySelector('button.stop');
+      // Update timer display
+      const hrs = Math.floor(station.elapsed / 3600);
+      const mins = Math.floor((station.elapsed % 3600) / 60);
+      const secs = station.elapsed % 60;
+      timerElem.textContent = `${hrs}:${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+      // Update game display
+      if (station.game) {
+        const icon = gameIcons[station.game] || '🎮';
+        gameElem.textContent = `${icon} ${station.game}`;
+      } else {
+        gameElem.textContent = '🎮 Тоглоом сонгоогүй';
+      }
+      // Update controllers
+      ctrlElem.textContent = `${station.players} 🎮`;
+      // Update classes and buttons
+      elem.classList.remove('busy', 'paused');
+      if (!station.busy) {
+        statusElem.textContent = 'Сул';
+        startBtn.style.display = 'block';
+        pauseBtn.style.display = 'none';
+        resumeBtn.style.display = 'none';
+        stopBtn.style.display = 'none';
+      } else if (station.paused) {
+        statusElem.textContent = 'Түр зогссон';
+        elem.classList.add('paused');
+        startBtn.style.display = 'none';
+        pauseBtn.style.display = 'none';
+        resumeBtn.style.display = 'block';
+        stopBtn.style.display = 'block';
+      } else {
+        statusElem.textContent = 'Явж байна';
+        elem.classList.add('busy');
+        startBtn.style.display = 'none';
+        pauseBtn.style.display = 'block';
+        resumeBtn.style.display = 'none';
+        stopBtn.style.display = 'block';
+      }
+    }
+
+    // Attach event listeners to station buttons
+    function attachStationListeners() {
+      document.querySelectorAll('.station').forEach(elem => {
+        const id = parseInt(elem.dataset.id);
+        const startBtn = elem.querySelector('button.start');
+        const pauseBtn = elem.querySelector('button.pause');
+        const resumeBtn = elem.querySelector('button.resume');
+        const stopBtn = elem.querySelector('button.stop');
+        startBtn.addEventListener('click', () => openStartModal(id));
+        pauseBtn.addEventListener('click', () => pauseSession(id));
+        resumeBtn.addEventListener('click', () => resumeSession(id));
+        stopBtn.addEventListener('click', () => openBillingModal(id));
+      });
+    }
+
+    // Open start modal for a station
+    let currentStartStationId = null;
+    function openStartModal(id) {
+      if (stations[id].busy) return;
+      currentStartStationId = id;
+      // Preselect previous game and players if same station
+      const st = stations[id];
+      if (st.game) gameSelect.value = st.game; else gameSelect.value = '';
+      playerCountInput.value = st.players || 1;
+      startStationLabel.textContent = st.name;
+      startModal.style.display = 'flex';
+    }
+    cancelStartBtn.addEventListener('click', () => {
+      startModal.style.display = 'none';
+      currentStartStationId = null;
+    });
+    confirmStartBtn.addEventListener('click', () => {
+      if (currentStartStationId == null) return;
+      const id = currentStartStationId;
+      const selectedGame = gameSelect.value || '';
+      let players = parseInt(playerCountInput.value);
+      if (isNaN(players) || players < 1) players = 1;
+      if (players > 4) players = 4;
+      startModal.style.display = 'none';
+      startSession(id, selectedGame, players);
+      currentStartStationId = null;
+    });
+
+    // Start session
+    function startSession(id, game, players) {
+      const st = stations[id];
+      if (st.busy) return;
+      st.busy = true;
+      st.paused = false;
+      st.startTime = Date.now();
+      st.elapsed = 0;
+      st.game = game;
+      st.players = players;
+      // Start timer
+      st.timerId = setInterval(() => {
+        st.elapsed += 1;
+        updateStationUI(id);
+      }, 1000);
+      updateStationUI(id);
+      showToast(`${st.name} сесс эхэллээ`);
+    }
+
+    // Pause session
+    function pauseSession(id) {
+      const st = stations[id];
+      if (!st.busy || st.paused) return;
+      st.paused = true;
+      if (st.timerId) {
+        clearInterval(st.timerId);
+        st.timerId = null;
+      }
+      updateStationUI(id);
+      showToast(`${st.name} сесс түр зогсов`);
+    }
+
+    // Resume session
+    function resumeSession(id) {
+      const st = stations[id];
+      if (!st.busy || !st.paused) return;
+      st.paused = false;
+      st.timerId = setInterval(() => {
+        st.elapsed += 1;
+        updateStationUI(id);
+      }, 1000);
+      updateStationUI(id);
+      showToast(`${st.name} сесс үргэлжлэв`);
+    }
+
+    // Open billing modal for station
+    let currentBillingStationId = null;
+    let currentBillingBase = 0;
+    function openBillingModal(id) {
+      const st = stations[id];
+      if (!st.busy) return;
+      // Stop timer
+      if (st.timerId) {
+        clearInterval(st.timerId);
+        st.timerId = null;
+      }
+      st.paused = false;
+      // Finalise elapsed seconds
+      const totalSeconds = st.elapsed;
+      // Compute base price
+      const hours = totalSeconds / 3600;
+      const rate = st.type === 'vip' ? VIP_RATE : NORMAL_RATE;
+      const base = Math.round(rate * st.players * hours);
+      currentBillingBase = base;
+      currentBillingStationId = id;
+      // Fill modal fields
+      billingStationInfo.textContent = `${st.name} • ${st.game || 'Тоглоом сонгоогүй'} • ${st.players} гар`;
+      billingDuration.textContent = `${Math.floor(totalSeconds/3600)}:${String(Math.floor((totalSeconds%3600)/60)).padStart(2,'0')}:${String(totalSeconds%60).padStart(2,'0')}`;
+      billingBase.textContent = base.toLocaleString('mn-MN');
+      billingMemberSelect.value = 'no';
+      billingMemberPhoneContainer.style.display = 'none';
+      billingMemberPhone.value = '';
+      billingDiscountInfo.style.display = 'none';
+      billingFinal.textContent = base.toLocaleString('mn-MN');
+      billingModal.style.display = 'flex';
+    }
+    cancelBillingBtn.addEventListener('click', () => {
+      // Close billing modal and reset session (cancelled, treat as cancelled)
+      billingModal.style.display = 'none';
+      if (currentBillingStationId != null) {
+        resetStation(currentBillingStationId);
+      }
+      currentBillingStationId = null;
+      currentBillingBase = 0;
+    });
+    billingMemberSelect.addEventListener('change', () => {
+      const val = billingMemberSelect.value;
+      if (val === 'yes') {
+        billingMemberPhoneContainer.style.display = 'block';
+      } else {
+        billingMemberPhoneContainer.style.display = 'none';
+        billingMemberPhone.value = '';
+        billingDiscountInfo.style.display = 'none';
+        billingFinal.textContent = currentBillingBase.toLocaleString('mn-MN');
+      }
+    });
+    billingMemberPhone.addEventListener('input', () => {
+      updateBillingDiscount();
+    });
+    function updateBillingDiscount() {
+      const phone = billingMemberPhone.value.trim();
+      const base = currentBillingBase;
+      if (!phone) {
+        billingDiscountInfo.style.display = 'none';
+        billingFinal.textContent = base.toLocaleString('mn-MN');
+        return;
+      }
+      // Find member
+      const member = memberList.find(m => m.phone === phone);
+      if (member) {
+        const discountPercent = parseFloat(member.discount) || DISCOUNT_PERCENT;
+        const discountAmount = Math.round(base * discountPercent / 100);
+        const finalAmount = base - discountAmount;
+        billingDiscountInfo.style.display = 'block';
+        billingDiscount.textContent = discountPercent.toString();
+        billingDiscountAmount.textContent = discountAmount.toLocaleString('mn-MN');
+        billingFinal.textContent = finalAmount.toLocaleString('mn-MN');
+      } else {
+        // Not a member: show no discount
+        billingDiscountInfo.style.display = 'none';
+        billingFinal.textContent = base.toLocaleString('mn-MN');
+      }
+    }
+    confirmBillingBtn.addEventListener('click', () => {
+      if (currentBillingStationId == null) return;
+      const id = currentBillingStationId;
+      const st = stations[id];
+      const base = currentBillingBase;
+      const memberPhone = billingMemberSelect.value === 'yes' ? billingMemberPhone.value.trim() : '';
+      let memberFound = null;
+      let discountPercent = 0;
+      if (memberPhone) {
+        memberFound = memberList.find(m => m.phone === memberPhone);
+        discountPercent = memberFound ? (parseFloat(memberFound.discount) || DISCOUNT_PERCENT) : 0;
+      }
+      const discountAmount = Math.round(base * discountPercent / 100);
+      const finalAmount = base - discountAmount;
+      // Save session log
+      const now = new Date();
+      const logEntry = {
+        date: now.toISOString().split('T')[0],
+        stationId: id,
+        stationName: st.name,
+        type: st.type,
+        game: st.game || '',
+        players: st.players,
+        duration: st.elapsed,
+        baseAmount: base,
+        discountPercent: discountPercent,
+        discountAmount: discountAmount,
+        finalAmount: finalAmount,
+        memberPhone: memberFound ? memberFound.phone : '',
+        memberName: memberFound ? memberFound.name : '',
+        createdAt: now.toISOString()
+      };
+      sessionLogs.push(logEntry);
+      saveToStorage(SESSIONS_KEY, sessionLogs);
+      purgeOldSessions();
+      // Update today's revenue display
+      updateTodayRevenue();
+      // Reset station state
+      resetStation(id);
+      // Hide billing
+      billingModal.style.display = 'none';
+      // Notify admin
+      showToast(`Сесс дууслаа. Төлөх: ₮${finalAmount.toLocaleString('mn-MN')}`);
+      currentBillingStationId = null;
+      currentBillingBase = 0;
+    });
+
+    // Reset a station after finishing session or cancelling
+    function resetStation(id) {
+      const st = stations[id];
+      if (st.timerId) {
+        clearInterval(st.timerId);
+        st.timerId = null;
+      }
+      st.busy = false;
+      st.paused = false;
+      st.startTime = null;
+      st.elapsed = 0;
+      st.game = '';
+      st.players = 1;
+      updateStationUI(id);
+    }
+
+    // Update today's revenue by summing today's finalAmount in logs
+    function updateTodayRevenue() {
+      const todayKey = new Date().toISOString().split('T')[0];
+      let total = 0;
+      sessionLogs.forEach(item => {
+        if (item.date === todayKey) total += item.finalAmount;
+      });
+      todayRevenueElem.textContent = total.toLocaleString('mn-MN');
+    }
+
+    // Toast notification helper
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // === Membership management ===
+    function renderMembers() {
+      membersList.innerHTML = '';
+      if (memberList.length === 0) {
+        membersList.textContent = 'Гишүүн бүртгэгдээгүй.';
+        return;
+      }
+      memberList.forEach(m => {
+        const div = document.createElement('div');
+        div.classList.add('member-item');
+        div.innerHTML = `<strong>${m.name}</strong> (${m.phone}) — ${m.discount}% off`;
+        membersList.appendChild(div);
+      });
+    }
+    addMemberBtn.addEventListener('click', () => {
+      const name = memberNameInput.value.trim() || 'Нэргүй';
+      const phone = memberPhoneInput.value.trim();
+      let disc = parseFloat(memberDiscountInput.value);
+      if (!phone) {
+        showToast('Утасны дугаар оруулна уу');
+        return;
+      }
+      if (isNaN(disc) || disc < 0) disc = 0;
+      if (disc > 100) disc = 100;
+      // Check if member exists
+      const existingIndex = memberList.findIndex(m => m.phone === phone);
+      if (existingIndex >= 0) {
+        memberList[existingIndex].name = name;
+        memberList[existingIndex].discount = disc;
+      } else {
+        memberList.push({ name: name, phone: phone, discount: disc });
+      }
+      saveToStorage(MEMBERS_KEY, memberList);
+      renderMembers();
+      memberNameInput.value = '';
+      memberPhoneInput.value = '';
+      memberDiscountInput.value = DISCOUNT_PERCENT;
+      showToast('Гишүүн нэмэгдлээ');
+    });
+
+    // === Report view ===
+    reportBtn.addEventListener('click', () => {
+      // Show code prompt overlay
+      reportCodeInput.value = '';
+      reportCodeError.style.display = 'none';
+      reportOverlay.style.display = 'flex';
+    });
+    reportCodeCancel.addEventListener('click', () => {
+      reportOverlay.style.display = 'none';
+    });
+    reportCodeConfirm.addEventListener('click', () => {
+      const code = reportCodeInput.value.trim();
+      if (code === PASSCODE) {
+        reportOverlay.style.display = 'none';
+        openReportView();
+      } else {
+        reportCodeError.style.display = 'block';
+      }
+    });
+    function openReportView() {
+      // Populate report data
+      populateReport();
+      reportView.style.display = 'flex';
+    }
+    closeReportBtn.addEventListener('click', () => {
+      reportView.style.display = 'none';
+    });
+    function populateReport() {
+      // Ensure expired sessions are purged
+      purgeOldSessions();
+      // Calculate today's and yesterday's totals
+      const todayKey = new Date().toISOString().split('T')[0];
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yKey = yesterday.toISOString().split('T')[0];
+      let todayTotal = 0;
+      let yesterdayTotal = 0;
+      sessionLogs.forEach(item => {
+        if (item.date === todayKey) todayTotal += item.finalAmount;
+        if (item.date === yKey) yesterdayTotal += item.finalAmount;
+      });
+      reportTodayTotal.textContent = todayTotal.toLocaleString('mn-MN');
+      reportYesterdayTotal.textContent = yesterdayTotal.toLocaleString('mn-MN');
+      // List sessions (most recent first)
+      reportList.innerHTML = '';
+      const sorted = sessionLogs.slice().sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+      sorted.forEach(item => {
+        const row = document.createElement('div');
+        row.classList.add('session-row');
+        const durationH = Math.floor(item.duration / 3600);
+        const durationM = Math.floor((item.duration % 3600) / 60);
+        const durationS = item.duration % 60;
+        const durStr = `${durationH}:${String(durationM).padStart(2,'0')}:${String(durationS).padStart(2,'0')}`;
+        const rowHtml = `
+          <div style="font-weight:bold;">${item.date} • ${item.stationName}</div>
+          <div style="font-size:0.8rem;">${item.game || '—'} (${item.players} гар) — Хугацаа: ${durStr}</div>
+          <div style="font-size:0.8rem;">Үндсэн үнэ: ₮${item.baseAmount.toLocaleString('mn-MN')} | Хөнгөлөлт: ₮${item.discountAmount.toLocaleString('mn-MN')} | Дүн: ₮${item.finalAmount.toLocaleString('mn-MN')}</div>
+          ${item.memberName ? `<div style="font-size:0.75rem; color:#888;">Гишүүн: ${item.memberName} (${item.memberPhone})</div>` : ''}
+        `;
+        row.innerHTML = rowHtml;
+        reportList.appendChild(row);
+      });
+    }
+
+    // === Login handling ===
+    loginBtn.addEventListener('click', () => {
+      const code = loginPass.value.trim();
+      if (code === PASSCODE) {
+        loginError.style.display = 'none';
+        loginPass.value = '';
+        loginOverlay.classList.add('hidden');
+        appContainer.style.display = 'block';
+        onAppReady();
+      } else {
+        loginError.style.display = 'block';
+        setTimeout(() => loginError.style.display = 'none', 2000);
+      }
+    });
+    loginPass.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        loginBtn.click();
+      }
+    });
+
+    // === App initialization after login ===
+    function onAppReady() {
+      // Set today's date label
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('mn-MN', { year:'numeric', month:'2-digit', day:'2-digit' });
+      dateLabel.textContent = `Өнөөдөр: ${dateStr}`;
+      // Initialise stations
+      initStations();
+      // Render members list
+      renderMembers();
+      // Purge old sessions and update today revenue
+      purgeOldSessions();
+      updateTodayRevenue();
+    }
+
+    // === Global keyboard shortcuts (optional) ===
+    // ESC key closes any modal (start, billing, report overlays)
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        // Close modals if visible
+        if (startModal.style.display === 'flex') {
+          startModal.style.display = 'none';
+          currentStartStationId = null;
+        }
+        if (billingModal.style.display === 'flex') {
+          billingModal.style.display = 'none';
+          if (currentBillingStationId != null) {
+            resetStation(currentBillingStationId);
+          }
+          currentBillingStationId = null;
+          currentBillingBase = 0;
+        }
+        if (reportOverlay.style.display === 'flex') {
+          reportOverlay.style.display = 'none';
+        }
+        if (reportView.style.display === 'flex') {
+          reportView.style.display = 'none';
+        }
+      }
+    });
+
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Өргөдөл гаргах — Hack the Future</title>
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Turf.js (Point-in-Polygon) -->
+  <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+  <!-- Икон (heroicon) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* Dropdown suggestion list */
+    .suggest-item { cursor:pointer; }
+    .suggest-item:hover { background:#f3f4f6; }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-900">
+  <!-- Header -->
+  <header class="bg-white shadow-sm sticky top-0 z-10">
+    <div class="mx-auto max-w-5xl px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">S</div>
+        <span class="font-semibold">Shedky</span>
+      </div>
+      <nav class="flex items-center gap-4 text-sm">
+        <a class="text-gray-600 hover:text-gray-900" href="#">Examples/Portfolio</a>
+        <a class="bg-blue-600 text-white px-4 py-1.5 rounded-md hover:bg-blue-700" href="#">Нүүр</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Card -->
+  <main class="mx-auto max-w-4xl px-4 py-8">
+    <div class="bg-white rounded-xl shadow-sm p-6">
+      <h1 class="text-xl font-semibold mb-4">Өргөдөл гаргах</h1>
+
+      <!-- Upload/Title block -->
+      <div class="border rounded-lg p-4 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-[96px_1fr] gap-4 items-start">
+          <div class="w-24 h-24 rounded-lg bg-gray-100 border flex items-center justify-center text-xs text-gray-500">
+            зураг
+          </div>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-sm text-gray-500 mb-1">Гарчиг:</label>
+              <input id="titleInput" type="text" placeholder="Өргөдлийн гарчиг…" class="w-full border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+              <label class="block text-sm text-gray-500 mb-1">Тайлбар:</label>
+              <textarea id="descInput" rows="3" placeholder="Өргөдлийн товч тайлбар…" class="w-full border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Location input -->
+      <div class="mb-2">
+        <label class="flex items-center gap-2 text-sm text-gray-600">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5Z"/></svg>
+          Байршил оруулах:
+        </label>
+      </div>
+      <div class="relative">
+        <input id="geoInput" type="text" placeholder="ж: Баянзүрх, 26-р хороо…" class="w-full border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500" autocomplete="off">
+        <!-- suggestions -->
+        <div id="suggestions" class="absolute left-0 right-0 top-full mt-1 bg-white border rounded-md shadow-lg hidden max-h-60 overflow-auto z-20"></div>
+      </div>
+
+      <!-- Result box -->
+      <div id="officialBox" class="min-h-28 mt-8 text-sm text-gray-700">
+        <pre id="officialText" class="whitespace-pre-wrap"></pre>
+      </div>
+
+      <!-- Submit -->
+      <div class="mt-6">
+        <button id="submitBtn" class="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700">ӨРГӨДЛИЙГ ИЛГЭЭХ</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-10 bg-blue-600 text-white">
+    <div class="mx-auto max-w-5xl px-6 py-6 grid md:grid-cols-4 gap-6 items-start">
+      <div>
+        <h4 class="font-semibold mb-2">Ерөнхий тухай</h4>
+        <p class="text-sm opacity-90">иргэдийн үг сонсох, асуудал шийдвэрлэх платформ.</p>
+      </div>
+      <div>
+        <h4 class="font-semibold mb-2">Холбоо барих</h4>
+        <p class="text-sm opacity-90">info@shedky.mn</p>
+        <p class="text-sm opacity-90">+976 8800-0000</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center">📍</div>
+        <div class="text-sm opacity-90">Улаанбаатар хот, Монгол улс</div>
+      </div>
+      <div class="justify-self-end">
+        <div class="bg-white p-2 rounded">
+          <!-- QR demo -->
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://shedky.mn" alt="QR">
+        </div>
+      </div>
+    </div>
+  </footer>
+
+<script>
+/* ---------- 1) Demo GeoJSON (жишээ) ---------- */
+/* Та энд өөрийн жинхэнэ хил (хороо/сум) GeoJSON-оо оруулна. */
+const BOUNDARIES_GEOJSON = {
+  "type":"FeatureCollection",
+  "features":[
+    { "type":"Feature",
+      "properties": { "admin_code":"UB-BZD-26", "admin_name":"УБ, Баянзүрх 26-р хороо" },
+      "geometry": { "type":"Polygon", "coordinates":[[
+        [106.9400,47.9160],[106.9600,47.9160],[106.9600,47.9300],[106.9400,47.9300],[106.9400,47.9160]
+      ]]}}
+    ,
+    { "type":"Feature",
+      "properties": { "admin_code":"UB-SBD-01", "admin_name":"УБ, Сүхбаатар 1-р хороо" },
+      "geometry": { "type":"Polygon", "coordinates":[[
+        [106.9000,47.9100],[106.9300,47.9100],[106.9300,47.9250],[106.9000,47.9250],[106.9000,47.9100]
+      ]]}},
+    { "type":"Feature",
+      "properties": { "admin_code":"UB-CHD-04", "admin_name":"УБ, Чингэлтэй 4-р хороо" },
+      "geometry": { "type":"Polygon", "coordinates":[[
+        [106.8900,47.9250],[106.9150,47.9250],[106.9150,47.9400],[106.8900,47.9400],[106.8900,47.9250]
+      ]]}}
+  ]
+};
+
+/* ---------- 2) Officials data (жишээ) ---------- */
+/* admin_code-оор та бодит даргын мэдээллээ холбож өгнө. */
+const OFFICIALS = {
+  "UB-BZD-26": { leader_name:"Чингүүн", title:"Х хороо засаг дарга", phone:"+976 9900-0001", email:"chingun@bzd.gov.mn" },
+  "UB-SBD-01": { leader_name:"Энх-Амгалан", title:"1-р хороо засаг дарга", phone:"+976 9900-0002", email:"enkh@sbd.gov.mn" },
+  "UB-CHD-04": { leader_name:"Саруул", title:"4-р хороо засаг дарга", phone:"+976 9900-0003", email:"saruul@chd.gov.mn" }
+};
+
+/* ---------- 3) Helper: дебаунс ---------- */
+function debounce(fn, ms=400){
+  let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), ms); };
+}
+
+/* ---------- 4) Geocode (Nominatim, API key шаардлагагүй) ---------- */
+async function geocodeQuery(q){
+  if(!q || q.trim().length < 3) return [];
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&addressdetails=1&limit=5`;
+  const r = await fetch(url, { headers: { "Accept":"application/json" } });
+  if(!r.ok) return [];
+  return await r.json(); // [{lat, lon, display_name}, ...]
+}
+
+/* ---------- 5) Point-in-Polygon шалгалт ---------- */
+function findArea({lat, lon}){
+  const pt = turf.point([parseFloat(lon), parseFloat(lat)]);
+  for(const f of BOUNDARIES_GEOJSON.features){
+    if(turf.booleanPointInPolygon(pt, f)) {
+      const code = f.properties.admin_code;
+      const area = f.properties.admin_name;
+      const official = OFFICIALS[code] || null;
+      return { code, area, official };
+    }
+  }
+  return null;
+}
+
+/* ---------- 6) UI logic ---------- */
+const $sugg = document.getElementById('suggestions');
+const $geo  = document.getElementById('geoInput');
+const $out  = document.getElementById('officialText');
+
+async function renderSuggestions(q){
+  const items = await geocodeQuery(q);
+  if(!items.length){ $sugg.classList.add('hidden'); $sugg.innerHTML=''; return; }
+  $sugg.innerHTML = items.map(i => `
+    <div class="suggest-item px-3 py-2 text-sm" data-lat="${i.lat}" data-lon="${i.lon}">
+      ${i.display_name}
+    </div>`).join('');
+  $sugg.classList.remove('hidden');
+}
+
+$geo.addEventListener('input', debounce(e => renderSuggestions(e.target.value), 350));
+
+$sugg.addEventListener('click', (e)=>{
+  const item = e.target.closest('.suggest-item');
+  if(!item) return;
+  const lat = item.getAttribute('data-lat');
+  const lon = item.getAttribute('data-lon');
+  $geo.value = item.textContent.trim();
+  $sugg.classList.add('hidden');
+
+  const match = findArea({lat, lon});
+  if(match && match.official){
+    const o = match.official;
+    $out.textContent =
+`Таны өргөдөл хаана очих вэ:
+Хариуцах нэгж: ${match.area}
+Албан тушаал: ${o.title}
+Нэр: ${o.leader_name}
+Утас: ${o.phone}
+И-мэйл: ${o.email}`;
+  } else if (match && !match.official) {
+    $out.textContent = `Харьяалал тодорлоо: ${match.area}
+Гэхдээ даргын мэдээлэл бүртгэлгүй байна. Админтай холбоо барина уу.`;
+  } else {
+    $out.textContent = 'Оруулсан байршил манай хилийн датаас олдсонгүй. Дахин тодруулж хайна уу.';
+  }
+});
+
+/* Submit демо */
+document.getElementById('submitBtn').addEventListener('click', ()=>{
+  alert('Өргөдөл илгээгдлээ (демо). Та backend/API холбож бодитоор хадгална.');
+});
+</script>
+</body>
+</html>
